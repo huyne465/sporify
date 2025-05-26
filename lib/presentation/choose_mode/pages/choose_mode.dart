@@ -14,138 +14,134 @@ class ChooseModePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final horizontalPadding = screenSize.width * 0.08; // 8% of screen width
+    final verticalPadding = screenSize.height * 0.06; // 6% of screen height
+    final modeButtonSize = screenSize.width < 400
+        ? 60.0
+        : 80.0; // Smaller button on small screens
+
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 40),
             decoration: BoxDecoration(
-              image: DecorationImage(image: AssetImage(AppImages.chooseModeBG)),
+              image: DecorationImage(
+                image: AssetImage(AppImages.chooseModeBG),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
-          // ignore: deprecated_member_use
           Container(color: Colors.black.withOpacity(0.15)),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 80),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: SvgPicture.asset(AppVectors.logo),
-                ),
-                Spacer(),
-                const Text(
-                  'Choose Mode',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 18,
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: verticalPadding,
+                horizontal: horizontalPadding,
+              ),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: SvgPicture.asset(
+                      AppVectors.logo,
+                      width: screenSize.width * 0.4, // 40% of screen width
+                    ),
                   ),
-                ),
-                const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.read<ThemeCubit>().updateTheme(
-                              ThemeMode.dark,
-                            );
-                          },
-                          child: ClipOval(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  // ignore: deprecated_member_use
-                                  color: Color(0xff30393C).withOpacity(0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: SvgPicture.asset(
-                                  AppVectors.moon,
-                                  fit: BoxFit.none,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        Text(
-                          'Dark Mode',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 17,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ],
+                  const Spacer(),
+                  const Text(
+                    'Choose Mode',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18,
                     ),
-                    SizedBox(width: 40),
-                    Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.read<ThemeCubit>().updateTheme(
-                              ThemeMode.light,
-                            );
-                          },
-                          child: ClipOval(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  // ignore: deprecated_member_use
-                                  color: Color(0xff30393C).withOpacity(0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: SvgPicture.asset(
-                                  AppVectors.sun,
-                                  fit: BoxFit.none,
-                                ),
-                              ),
-                            ),
-                          ),
+                  ),
+                  SizedBox(
+                    height: screenSize.height * 0.04,
+                  ), // 4% of screen height
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildModeOption(
+                        context: context,
+                        title: 'Dark Mode',
+                        icon: AppVectors.moon,
+                        onTap: () => context.read<ThemeCubit>().updateTheme(
+                          ThemeMode.dark,
                         ),
-                        SizedBox(height: 15),
-                        Text(
-                          'Light Mode',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 17,
-                            color: AppColors.grey,
-                          ),
+                        size: modeButtonSize,
+                      ),
+                      SizedBox(
+                        width: screenSize.width * 0.05,
+                      ), // 5% of screen width
+                      _buildModeOption(
+                        context: context,
+                        title: 'Light Mode',
+                        icon: AppVectors.sun,
+                        onTap: () => context.read<ThemeCubit>().updateTheme(
+                          ThemeMode.light,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 50),
-                BasicButton(
-                  onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (BuildContext context) =>
-                    //         const ChooseModePage(),
-                    //   ),
-                    // );
-                    Navigator.pop(context);
-                  },
-                  title: 'Continue',
-                  height: 85,
-                ),
-              ],
+                        size: modeButtonSize,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: screenSize.height * 0.05,
+                  ), // 5% of screen height
+                  BasicButton(
+                    onPressed: () => Navigator.pop(context),
+                    title: 'Continue',
+                    height: screenSize.height * 0.075, // 7.5% of screen height
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildModeOption({
+    required BuildContext context,
+    required String title,
+    required String icon,
+    required VoidCallback onTap,
+    required double size,
+  }) {
+    final fontSize = size < 70 ? 14.0 : 17.0;
+
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                height: size,
+                width: size,
+                decoration: BoxDecoration(
+                  color: const Color(0xff30393C).withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(icon, fit: BoxFit.none),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: fontSize,
+            color: AppColors.grey,
+          ),
+        ),
+      ],
     );
   }
 }
