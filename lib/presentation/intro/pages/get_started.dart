@@ -15,7 +15,7 @@ class GetStartedPage extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 45),
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 40),
             decoration: BoxDecoration(
               image: DecorationImage(image: AssetImage(AppImages.introBG)),
             ),
@@ -24,7 +24,7 @@ class GetStartedPage extends StatelessWidget {
           // ignore: deprecated_member_use
           Container(color: Colors.black.withOpacity(0.15)),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 40),
+            padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 80),
             child: Column(
               children: [
                 Align(
