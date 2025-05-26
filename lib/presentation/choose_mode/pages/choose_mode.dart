@@ -7,6 +7,7 @@ import 'package:sporify/common/widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_images.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
+import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
 
 class ChooseModePage extends StatelessWidget {
@@ -73,9 +74,7 @@ class ChooseModePage extends StatelessWidget {
                         ),
                         size: modeButtonSize,
                       ),
-                      SizedBox(
-                        width: screenSize.width * 0.05,
-                      ), // 5% of screen width
+                      SizedBox(width: 55),
                       _buildModeOption(
                         context: context,
                         title: 'Light Mode',
@@ -91,7 +90,15 @@ class ChooseModePage extends StatelessWidget {
                     height: screenSize.height * 0.05,
                   ), // 5% of screen height
                   BasicButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              const SignupOrSigninPage(),
+                        ),
+                      );
+                    },
                     title: 'Continue',
                     height: screenSize.height * 0.075, // 7.5% of screen height
                   ),
