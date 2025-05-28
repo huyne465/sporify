@@ -6,6 +6,7 @@ import 'package:sporify/common/widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_images.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
+import 'package:sporify/presentation/auth/pages/signup.dart';
 
 class SignupOrSigninPage extends StatelessWidget {
   const SignupOrSigninPage({super.key});
@@ -57,7 +58,14 @@ class SignupOrSigninPage extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: BasicButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => SignupPage(),
+                              ),
+                            );
+                          },
                           title: 'Register',
                           height: 73,
                         ),

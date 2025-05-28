@@ -17,7 +17,14 @@ class BasicButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(minimumSize: Size.fromHeight(height)),
-      child: Text(title, style: TextStyle(color: AppColors.lightBackground)),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: AppColors.lightBackground,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }
