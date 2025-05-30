@@ -7,4 +7,6 @@ class AppVectors {
   static const String moon = '${basePath}moon$format';
   static const String topPattern = '${basePath}union1$format';
   static const String botPattern = '${basePath}union2$format';
+  static const String gmailIcon = '${basePath}gmail$format';
+  static const String appleIcon = '${basePath}apple$format';
 }
