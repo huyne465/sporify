@@ -6,6 +6,7 @@ import 'package:sporify/common/widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_images.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
+import 'package:sporify/presentation/auth/pages/signin.dart';
 import 'package:sporify/presentation/auth/pages/signup.dart';
 
 class SignupOrSigninPage extends StatelessWidget {
@@ -74,7 +75,14 @@ class SignupOrSigninPage extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => SignInPage(),
+                              ),
+                            );
+                          },
                           child: Text(
                             'Sign In',
                             style: TextStyle(

@@ -7,10 +7,10 @@ import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/common/widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
-import 'package:sporify/presentation/auth/pages/signin.dart';
+import 'package:sporify/presentation/auth/pages/signup.dart';
 
-class SignupPage extends StatelessWidget {
-  const SignupPage({super.key});
+class SignInPage extends StatelessWidget {
+  const SignInPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,48 +25,40 @@ class SignupPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _registerText(),
+            _signInHeadText(),
             const SizedBox(height: 5), // Reduced
             _supportText(context),
-            const SizedBox(height: 15), // Reduced
-            _fullNameField(context),
             const SizedBox(height: 16),
             _emailField(context),
             const SizedBox(height: 16),
             _passWordField(context),
-            const SizedBox(height: 16), // Reduced
+            const SizedBox(), // Reduced
+            _forgotPassword(context),
+            const SizedBox(),
             BasicButton(
               onPressed: () {},
-              title: 'Create Account',
+              title: 'Sign In',
               height: 80,
             ), // Reduced height
-            const SizedBox(height: 5), // Reduced
+            const SizedBox(height: 15), // Reduced
             _orLine(context),
-            const SizedBox(height: 10), // Reduced
+            const SizedBox(height: 15), // Reduced
             _gmailOrApple(context),
+            const SizedBox(height: 10), // Add some bottom padding
           ],
         ),
       ),
       //bottom navigation
-      bottomNavigationBar: _signInText(context),
+      bottomNavigationBar: _signUpText(context),
     );
   }
 
-  //Register
-  Widget _registerText() {
+  //Sign In
+  Widget _signInHeadText() {
     return Text(
-      'Register',
+      'Sign In',
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
       textAlign: TextAlign.center,
-    );
-  }
-
-  //full name
-  Widget _fullNameField(BuildContext context) {
-    return TextField(
-      decoration: const InputDecoration(
-        hintText: 'Full Name',
-      ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }
 
@@ -74,7 +66,7 @@ class SignupPage extends StatelessWidget {
   Widget _emailField(BuildContext context) {
     return TextField(
       decoration: const InputDecoration(
-        hintText: 'Enter Email',
+        hintText: 'Enter Email Or Username',
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }
@@ -89,14 +81,14 @@ class SignupPage extends StatelessWidget {
   }
 
   //bottom app bar sign in text button
-  Widget _signInText(BuildContext context) {
+  Widget _signUpText(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(vertical: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            'Do You Have An Account?',
+            'Not A Member?',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           TextButton(
@@ -104,12 +96,12 @@ class SignupPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => SignInPage(),
+                  builder: (BuildContext context) => SignupPage(),
                 ),
               );
             },
             child: Text(
-              'Sign In',
+              'Register Now',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -145,6 +137,28 @@ class SignupPage extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
                 color: AppColors.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _forgotPassword(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'Recovery Password',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: context.isDarkMode ? Color(0xffAEAEAE) : Colors.black,
               ),
             ),
           ),

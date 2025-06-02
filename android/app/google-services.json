@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "91817906532",
+    "project_id": "sporify01",
+    "storage_bucket": "sporify01.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91817906532:android:14a561a52cc61acb4f6a71",
+        "android_client_info": {
+          "package_name": "com.example.sporify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL0tvKposHs4RwhsPdZ6x9Iq7wIuvghLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
