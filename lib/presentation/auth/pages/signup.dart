@@ -7,10 +7,18 @@ import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/common/widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
+import 'package:sporify/data/models/auth/create_user_request.dart';
+import 'package:sporify/domain/usecases/auth/signup.dart';
 import 'package:sporify/presentation/auth/pages/signin.dart';
+import 'package:sporify/presentation/root/pages/root.dart';
+import 'package:sporify/service_locator.dart';
 
 class SignupPage extends StatelessWidget {
-  const SignupPage({super.key});
+  SignupPage({super.key});
+
+  final TextEditingController _fullname = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +44,30 @@ class SignupPage extends StatelessWidget {
             _passWordField(context),
             const SizedBox(height: 16), // Reduced
             BasicButton(
-              onPressed: () {},
+              onPressed: () async {
+                var result = await sl<SignupUseCase>().call(
+                  params: CreateUserRequest(
+                    fullName: _fullname.text.toString(),
+                    email: _email.text.toString(),
+                    password: _password.text.toString(),
+                  ),
+                );
+                result.fold(
+                  (l) {
+                    var snackBar = SnackBar(content: Text(l));
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
+                  (r) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => const RootPage(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                );
+              },
               title: 'Create Account',
               height: 80,
             ), // Reduced height
@@ -64,6 +95,7 @@ class SignupPage extends StatelessWidget {
   //full name
   Widget _fullNameField(BuildContext context) {
     return TextField(
+      controller: _fullname,
       decoration: const InputDecoration(
         hintText: 'Full Name',
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
@@ -73,6 +105,7 @@ class SignupPage extends StatelessWidget {
   //Email
   Widget _emailField(BuildContext context) {
     return TextField(
+      controller: _email,
       decoration: const InputDecoration(
         hintText: 'Enter Email',
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
@@ -82,6 +115,7 @@ class SignupPage extends StatelessWidget {
   //Password
   Widget _passWordField(BuildContext context) {
     return TextField(
+      controller: _password,
       decoration: const InputDecoration(
         hintText: 'Password',
       ).applyDefaults(Theme.of(context).inputDecorationTheme),

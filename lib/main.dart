@@ -8,6 +8,7 @@ import 'package:sporify/core/configs/themes/app_theme.dart';
 import 'package:sporify/firebase_options.dart';
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
+import 'package:sporify/service_locator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,7 @@ Future<void> main() async {
         : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initializeDependencies();
   runApp(const MyApp());
 }
 
