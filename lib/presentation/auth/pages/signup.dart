@@ -30,52 +30,54 @@ class SignupPage extends StatelessWidget {
       //body
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _registerText(),
-            const SizedBox(height: 5), // Reduced
-            _supportText(context),
-            const SizedBox(height: 15), // Reduced
-            _fullNameField(context),
-            const SizedBox(height: 16),
-            _emailField(context),
-            const SizedBox(height: 16),
-            _passWordField(context),
-            const SizedBox(height: 16), // Reduced
-            BasicButton(
-              onPressed: () async {
-                var result = await sl<SignupUseCase>().call(
-                  params: CreateUserRequest(
-                    fullName: _fullname.text.toString(),
-                    email: _email.text.toString(),
-                    password: _password.text.toString(),
-                  ),
-                );
-                result.fold(
-                  (l) {
-                    var snackBar = SnackBar(content: Text(l));
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
-                  (r) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => const RootPage(),
-                      ),
-                      (route) => false,
-                    );
-                  },
-                );
-              },
-              title: 'Create Account',
-              height: 80,
-            ), // Reduced height
-            const SizedBox(height: 5), // Reduced
-            _orLine(context),
-            const SizedBox(height: 10), // Reduced
-            _gmailOrApple(context),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _registerText(),
+              const SizedBox(height: 5), // Reduced
+              _supportText(context),
+              const SizedBox(height: 15), // Reduced
+              _fullNameField(context),
+              const SizedBox(height: 16),
+              _emailField(context),
+              const SizedBox(height: 16),
+              _passWordField(context),
+              const SizedBox(height: 16), // Reduced
+              BasicButton(
+                onPressed: () async {
+                  var result = await sl<SignupUseCase>().call(
+                    params: CreateUserRequest(
+                      fullName: _fullname.text.toString(),
+                      email: _email.text.toString(),
+                      password: _password.text.toString(),
+                    ),
+                  );
+                  result.fold(
+                    (l) {
+                      var snackBar = SnackBar(content: Text(l));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    },
+                    (r) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => const RootPage(),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                  );
+                },
+                title: 'Create Account',
+                height: 80,
+              ), // Reduced height
+              const SizedBox(height: 5), // Reduced
+              _orLine(context),
+              const SizedBox(height: 10), // Reduced
+              _gmailOrApple(context),
+            ],
+          ),
         ),
       ),
       //bottom navigation

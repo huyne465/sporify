@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:sporify/core/usecase/usecase.dart';
 import 'package:sporify/data/models/auth/create_user_request.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
