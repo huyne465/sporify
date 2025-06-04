@@ -10,7 +10,7 @@ import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/data/models/auth/signin_user_request.dart';
 import 'package:sporify/domain/usecases/auth/signin.dart';
 import 'package:sporify/presentation/auth/pages/signup.dart';
-import 'package:sporify/presentation/root/pages/root.dart';
+import 'package:sporify/presentation/root/pages/home.dart';
 import 'package:sporify/service_locator.dart';
 
 class SignInPage extends StatelessWidget {
@@ -60,7 +60,7 @@ class SignInPage extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => const RootPage(),
+                          builder: (BuildContext context) => const HomePage(),
                         ),
                         (route) => false,
                       );

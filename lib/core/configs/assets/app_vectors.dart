@@ -9,4 +9,5 @@ class AppVectors {
   static const String botPattern = '${basePath}union2$format';
   static const String gmailIcon = '${basePath}gmail$format';
   static const String appleIcon = '${basePath}apple$format';
+  static const String artistCard = '${basePath}frame1$format';
 }
