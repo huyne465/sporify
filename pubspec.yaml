@@ -27,7 +27,8 @@ dependencies:
   firebase_auth:
   firebase_core: 
   get_it:
-  dartz: 
+  dartz:
+  cloud_firestore:  
 
 dev_dependencies:
   flutter_test:
