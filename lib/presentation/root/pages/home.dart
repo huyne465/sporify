@@ -6,6 +6,7 @@ import 'package:sporify/core/configs/assets/app_images.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/presentation/root/widgets/new_song.dart';
+import 'package:sporify/presentation/root/widgets/play_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -76,6 +77,47 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
               ),
+
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 10,
+                  top: 20,
+                  bottom: 15,
+                  right: 20,
+                ),
+
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Top Playlists',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                        color: context.isDarkMode
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'See More',
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 15,
+                          color: context.isDarkMode
+                              ? Color(0xffC6C6C6)
+                              : Color(0xff131313),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PlayList(),
+              const SizedBox(height: 20),
 
               // Add placeholder for more content
               Container(

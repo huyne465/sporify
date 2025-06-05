@@ -8,6 +8,7 @@ import 'package:sporify/domain/repository/song/song.dart';
 import 'package:sporify/domain/usecases/auth/signin.dart';
 import 'package:sporify/domain/usecases/auth/signup.dart';
 import 'package:sporify/domain/usecases/song/get_new_songs.dart';
+import 'package:sporify/domain/usecases/song/get_play_list.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -21,4 +22,5 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SongFirebaseService>(SongFirebaseServiceImpl());
   sl.registerSingleton<SongRepository>(SongRepositoryImplementation());
   sl.registerSingleton<GetNewSongsUseCase>(GetNewSongsUseCase());
+  sl.registerSingleton<GetPlayListUseCase>(GetPlayListUseCase());
 }

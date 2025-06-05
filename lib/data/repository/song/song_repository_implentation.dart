@@ -9,4 +9,9 @@ class SongRepositoryImplementation extends SongRepository {
   Future<Either<String, List<SongEntity>>> getNewsSongs() async {
     return await sl<SongFirebaseService>().getNewsSongs();
   }
+
+  @override
+  Future<Either<String, List<SongEntity>>> getPlayList() async {
+    return await sl<SongFirebaseService>().getPlayList();
+  }
 }
