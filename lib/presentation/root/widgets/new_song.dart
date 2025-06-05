@@ -94,6 +94,7 @@ class NewsSongs extends StatelessWidget {
         final imageUrl = AppUrls.getImageUrl(
           songs[index].artist,
           songs[index].title,
+          songs[index].image,
         );
 
         return Container(
