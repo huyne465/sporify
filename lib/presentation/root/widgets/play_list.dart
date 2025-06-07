@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
+import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
@@ -171,21 +172,7 @@ class PlayList extends StatelessWidget {
                   ),
                 ),
                 // Add heart icon for favorite feature
-                IconButton(
-                  icon: Icon(Icons.favorite_border, color: Colors.grey[600]),
-                  onPressed: () {
-                    // Add to favorites functionality
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Added ${songs[index].title} to favorites',
-                        ),
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                ),
+                FavoriteButton(songEntity: songs[index]),
                 // Play button
                 Container(
                   margin: const EdgeInsets.only(right: 13),

@@ -7,8 +7,10 @@ import 'package:sporify/domain/repository/auth/auth.dart';
 import 'package:sporify/domain/repository/song/song.dart';
 import 'package:sporify/domain/usecases/auth/signin.dart';
 import 'package:sporify/domain/usecases/auth/signup.dart';
+import 'package:sporify/domain/usecases/song/add_or_remove_song.dart';
 import 'package:sporify/domain/usecases/song/get_new_songs.dart';
 import 'package:sporify/domain/usecases/song/get_play_list.dart';
+import 'package:sporify/domain/usecases/song/is_favorite.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -23,4 +25,7 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SongRepository>(SongRepositoryImplementation());
   sl.registerSingleton<GetNewSongsUseCase>(GetNewSongsUseCase());
   sl.registerSingleton<GetPlayListUseCase>(GetPlayListUseCase());
+  //add to add or remove favorite, is favorite
+  sl.registerSingleton<AddOrRemoveSongUseCase>(AddOrRemoveSongUseCase());
+  sl.registerSingleton<IsFavoriteUseCase>(IsFavoriteUseCase());
 }
