@@ -80,8 +80,13 @@ class SongPlayerCubit extends HydratedCubit<SongPlayerState> {
   SongPlayerState? fromJson(Map<String, dynamic> json) {
     try {
       currentSongUrl = json['currentSongUrl'];
-      songPosition = Duration(milliseconds: json['positionMillis'] ?? 0);
-      songDuration = Duration(milliseconds: json['durationMillis'] ?? 0);
+      // Fix: Ensure we handle both int and double types
+      songPosition = Duration(
+        milliseconds: (json['positionMillis'] ?? 0).toInt(),
+      );
+      songDuration = Duration(
+        milliseconds: (json['durationMillis'] ?? 0).toInt(),
+      );
 
       return SongPlayerLoaded();
     } catch (_) {

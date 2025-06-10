@@ -5,6 +5,7 @@ import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/assets/app_images.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
+import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/root/widgets/new_song.dart';
 import 'package:sporify/presentation/root/widgets/play_list.dart';
 
@@ -33,120 +34,136 @@ class _HomePageState extends State<HomePage>
         title: SvgPicture.asset(AppVectors.logo, height: 40, width: 40),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _homeTopArtistCard(),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, top: 10),
-                child: Text(
-                  "Discover New Music",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    color: context.isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ),
-              _tabs(),
-              SizedBox(
-                height: 270, // Adjusted height
-                child: TabBarView(
-                  physics: const BouncingScrollPhysics(),
-                  controller: _tabController,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const NewsSongs(),
-                    Container(child: Center(child: Text("Coming soon"))),
-                    Container(child: Center(child: Text("Coming soon"))),
-                    Container(child: Center(child: Text("Coming soon"))),
-                  ],
-                ),
-              ),
-
-              // Add Top Playlists section
-              Padding(
-                padding: const EdgeInsets.only(left: 20, top: 20, bottom: 15),
-                child: Text(
-                  "Popular Artists",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    color: context.isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 10,
-                  top: 20,
-                  bottom: 15,
-                  right: 20,
-                ),
-
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Top Playlists',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: context.isDarkMode
-                            ? Colors.white
-                            : Colors.black87,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
+                    _homeTopArtistCard(),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, top: 10),
                       child: Text(
-                        'See More',
+                        "Discover New Music",
                         style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
                           color: context.isDarkMode
-                              ? Color(0xffC6C6C6)
-                              : Color(0xff131313),
+                              ? Colors.white
+                              : Colors.black87,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
+                    _tabs(),
+                    SizedBox(
+                      height: 270, // Adjusted height
+                      child: TabBarView(
+                        physics: const BouncingScrollPhysics(),
+                        controller: _tabController,
+                        children: [
+                          const NewsSongs(),
+                          Container(child: Center(child: Text("Coming soon"))),
+                          Container(child: Center(child: Text("Coming soon"))),
+                          Container(child: Center(child: Text("Coming soon"))),
+                        ],
+                      ),
+                    ),
+
+                    // Add Top Playlists section
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        top: 20,
+                        bottom: 15,
+                      ),
+                      child: Text(
+                        "Popular Artists",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: context.isDarkMode
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 10,
+                        top: 20,
+                        bottom: 15,
+                        right: 20,
+                      ),
+
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Top Playlists',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              color: context.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'See More',
+                              style: TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 15,
+                                color: context.isDarkMode
+                                    ? Color(0xffC6C6C6)
+                                    : Color(0xff131313),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const PlayList(),
+                    const SizedBox(height: 20),
+
+                    // Add placeholder for more content
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      height: 100,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary.withOpacity(0.6),
+                            AppColors.darkGrey.withOpacity(0.7),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "More content coming soon",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 80), // Add space for mini player
                   ],
                 ),
               ),
-              const PlayList(),
-              const SizedBox(height: 20),
-
-              // Add placeholder for more content
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                height: 100,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary.withOpacity(0.6),
-                      AppColors.darkGrey.withOpacity(0.7),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Center(
-                  child: Text(
-                    "More content coming soon",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: const MiniPlayer(),
     );
   }
 

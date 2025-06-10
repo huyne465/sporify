@@ -5,6 +5,7 @@ import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/root/bloc/play_list_cubit.dart';
 import 'package:sporify/presentation/root/bloc/play_list_state.dart';
 import 'package:sporify/presentation/song_player/pages/song_player.dart';
@@ -167,7 +168,11 @@ class PlayList extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     onTap: () {
-                      // Handle tapping on the playlist item
+                      // Use global music player
+                      context.read<GlobalMusicPlayerCubit>().loadSong(
+                        songs[index],
+                        songList: songs,
+                      );
                     },
                   ),
                 ),
@@ -190,13 +195,20 @@ class PlayList extends StatelessWidget {
                           : Color(0xff555555),
                     ),
                     onPressed: () {
+                      // Use global music player
+                      context.read<GlobalMusicPlayerCubit>().loadSong(
+                        songs[index],
+                        songList: songs,
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
                               SongPlayerPage(songEntity: songs[index]),
                         ),
-                      ); // You can add play functionality here
+                      );
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Playing ${songs[index].title}'),

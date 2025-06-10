@@ -7,16 +7,21 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sporify/core/configs/themes/app_theme.dart';
 import 'package:sporify/firebase_options.dart';
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
 import 'package:sporify/service_locator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Correct way to initialize HydratedStorage
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+        ? HydratedStorage.webStorageDirectory
+        : await getApplicationDocumentsDirectory(),
   );
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeDependencies();
 
@@ -29,7 +34,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => ThemeCubit())],
+      providers: [
+        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => GlobalMusicPlayerCubit()),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, mode) => MaterialApp(
           title: 'Flutter Demo',
@@ -37,9 +45,21 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           themeMode: mode,
           debugShowCheckedModeBanner: false,
-          home: const SplashPage(),
+          home: const AppWithMiniPlayer(),
         ),
       ),
+    );
+  }
+}
+
+class AppWithMiniPlayer extends StatelessWidget {
+  const AppWithMiniPlayer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: const SplashPage(),
+      bottomNavigationBar: const MiniPlayer(),
     );
   }
 }

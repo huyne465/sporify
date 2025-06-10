@@ -5,8 +5,12 @@ import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:sporify/presentation/song_player/bloc/song_player_state.dart';
+import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
+import 'package:sporify/presentation/lyrics/widgets/lyrics_view.dart';
 
 class SongPlayerPage extends StatefulWidget {
   final SongEntity songEntity;
@@ -18,33 +22,54 @@ class SongPlayerPage extends StatefulWidget {
 
 class _SongPlayerPageState extends State<SongPlayerPage> {
   bool isFavorite = false;
+  bool _showLyrics = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load song in global player if not already playing
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final globalCubit = context.read<GlobalMusicPlayerCubit>();
+      if (globalCubit.state.currentSong?.songId != widget.songEntity.songId) {
+        globalCubit.loadSong(widget.songEntity);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        final cubit = SongPlayerCubit();
-        // Load the song URL from Firestore
-        // Load the song URL from Firestore and seek to saved position if same song
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          cubit.LoadSong(widget.songEntity.songUrl);
-        });
-        cubit.LoadSong(widget.songEntity.songUrl);
-        return cubit;
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) {
+            final cubit = LyricsCubit();
+            cubit.getLyrics(widget.songEntity.artist, widget.songEntity.title);
+            return cubit;
+          },
+        ),
+      ],
       child: Scaffold(
         appBar: BasicAppBar(
           title: Text('Now Playing', style: TextStyle(fontSize: 18)),
           action: IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.more_vert_rounded),
+            onPressed: () {
+              setState(() {
+                _showLyrics = !_showLyrics;
+              });
+            },
+            icon: Icon(_showLyrics ? Icons.music_note : Icons.lyrics),
           ),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             child: Column(
-              children: [_songDetail(context), _buildPlayerControls()],
+              children: [
+                _songDetail(context),
+                _buildPlayerControls(),
+                if (_showLyrics) _buildLyricsSection(),
+                const SizedBox(height: 80), // Space for mini player
+              ],
             ),
           ),
         ),
@@ -129,9 +154,9 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
   }
 
   Widget _buildPlayerControls() {
-    return BlocBuilder<SongPlayerCubit, SongPlayerState>(
+    return BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
       builder: (context, state) {
-        final cubit = context.read<SongPlayerCubit>();
+        final cubit = context.read<GlobalMusicPlayerCubit>();
 
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
@@ -153,12 +178,12 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   ),
                 ),
                 child: Slider(
-                  value: cubit.songPosition.inSeconds.toDouble(),
-                  max: cubit.songDuration.inSeconds.toDouble() == 0
+                  value: state.position.inSeconds.toDouble(),
+                  max: state.duration.inSeconds.toDouble() == 0
                       ? widget.songEntity.duration.toDouble()
-                      : cubit.songDuration.inSeconds.toDouble(),
+                      : state.duration.inSeconds.toDouble(),
                   onChanged: (value) {
-                    cubit.audioPlayer.seek(Duration(seconds: value.toInt()));
+                    cubit.seekTo(Duration(seconds: value.toInt()));
                   },
                 ),
               ),
@@ -170,13 +195,13 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _formatDuration(cubit.songPosition),
+                      _formatDuration(state.position),
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                     Text(
                       _formatDuration(
-                        cubit.songDuration.inSeconds > 0
-                            ? cubit.songDuration
+                        state.duration.inSeconds > 0
+                            ? state.duration
                             : Duration(
                                 seconds: widget.songEntity.duration.toInt(),
                               ),
@@ -195,9 +220,10 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.skip_previous, size: 36),
-                    onPressed: () {
-                      // Previous song functionality
-                    },
+                    onPressed:
+                        cubit.playlist.isNotEmpty && cubit.currentSongIndex > 0
+                        ? () => cubit.playPrevious()
+                        : null,
                   ),
                   Container(
                     width: 80,
@@ -215,22 +241,22 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                     ),
                     child: IconButton(
                       icon: Icon(
-                        cubit.audioPlayer.playing
-                            ? Icons.pause
-                            : Icons.play_arrow,
+                        state.isPlaying ? Icons.pause : Icons.play_arrow,
                         color: Colors.white,
                         size: 40,
                       ),
                       onPressed: () {
-                        cubit.PlayOrPauseSong();
+                        cubit.playOrPause();
                       },
                     ),
                   ),
                   IconButton(
                     icon: Icon(Icons.skip_next, size: 36),
-                    onPressed: () {
-                      // Next song functionality
-                    },
+                    onPressed:
+                        cubit.playlist.isNotEmpty &&
+                            cubit.currentSongIndex < cubit.playlist.length - 1
+                        ? () => cubit.playNext()
+                        : null,
                   ),
                 ],
               ),
@@ -268,6 +294,33 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                 ],
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLyricsSection() {
+    return BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+      builder: (context, state) {
+        final imageUrl = AppUrls.getImageUrl(
+          widget.songEntity.artist,
+          widget.songEntity.title,
+          widget.songEntity.image,
+        );
+
+        return Container(
+          height: 400,
+          margin: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[900]
+                : Colors.grey[100],
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: LyricsView(
+            currentPosition: state.position,
+            coverImageUrl: imageUrl,
           ),
         );
       },
