@@ -7,8 +7,6 @@ import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
-import 'package:sporify/presentation/song_player/bloc/song_player_cubit.dart';
-import 'package:sporify/presentation/song_player/bloc/song_player_state.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
 import 'package:sporify/presentation/lyrics/widgets/lyrics_view.dart';
 

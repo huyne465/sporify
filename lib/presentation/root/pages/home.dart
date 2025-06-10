@@ -8,6 +8,7 @@ import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/root/widgets/new_song.dart';
 import 'package:sporify/presentation/root/widgets/play_list.dart';
+import 'package:sporify/presentation/root/widgets/artist_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -65,13 +66,13 @@ class _HomePageState extends State<HomePage>
                         children: [
                           const NewsSongs(),
                           Container(child: Center(child: Text("Coming soon"))),
-                          Container(child: Center(child: Text("Coming soon"))),
+                          const ArtistList(), // Add artist list here
                           Container(child: Center(child: Text("Coming soon"))),
                         ],
                       ),
                     ),
 
-                    // Add Top Playlists section
+                    // Add Top Artists section
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 20,
@@ -89,6 +90,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                     ),
+                    const ArtistList(),
 
                     Padding(
                       padding: const EdgeInsets.only(
