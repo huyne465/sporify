@@ -29,6 +29,35 @@ class SongModel {
     releaseDate = data['releaseDate'];
     image = data['image'];
     songUrl = data['songUrl'];
+    isFavorite = data['isFavorite'];
+    songId = data['songId'];
+  }
+
+  factory SongModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return SongModel(
+      title: data['title'],
+      artist: data['artist'],
+      duration: data['duration']?.toDouble(),
+      releaseDate: data['releaseDate'],
+      image: data['image'],
+      songUrl: data['songUrl'],
+      isFavorite: data['isFavorite'] ?? false,
+      songId: doc.id,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'title': title,
+      'artist': artist,
+      'duration': duration,
+      'releaseDate': releaseDate,
+      'image': image,
+      'songUrl': songUrl,
+      'isFavorite': isFavorite,
+      'songId': songId,
+    };
   }
 }
 
