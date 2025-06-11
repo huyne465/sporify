@@ -66,7 +66,9 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                 _songDetail(context),
                 _buildPlayerControls(),
                 if (_showLyrics) _buildLyricsSection(),
-                const SizedBox(height: 80), // Space for mini player
+                const SizedBox(
+                  height: 20,
+                ), // Reduced space since no mini player
               ],
             ),
           ),

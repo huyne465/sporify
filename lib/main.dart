@@ -57,9 +57,6 @@ class AppWithMiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: const SplashPage(),
-      bottomNavigationBar: const MiniPlayer(),
-    );
+    return const SplashPage(); // Remove the scaffold wrapper, let splash handle navigation
   }
 }
