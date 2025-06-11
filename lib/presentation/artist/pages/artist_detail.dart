@@ -24,6 +24,8 @@ class ArtistDetailPage extends StatelessWidget {
               _buildArtistImage(),
               const SizedBox(height: 20),
               _buildArtistName(context),
+              const SizedBox(height: 20),
+              _buildArtistDescription(context),
               const SizedBox(height: 30),
               _buildArtistInfo(),
               const SizedBox(height: 30),
@@ -79,6 +81,39 @@ class ArtistDetailPage extends StatelessWidget {
             : Colors.black87,
       ),
       textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildArtistDescription(BuildContext context) {
+    final String description = artist.describe.isNotEmpty == true
+        ? artist.describe
+        : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'About',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          _ExpandableText(text: description, maxLines: 4),
+        ],
+      ),
     );
   }
 
@@ -158,6 +193,59 @@ class ArtistDetailPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+//logic of see more or see less
+class _ExpandableText extends StatefulWidget {
+  final String text;
+  final int maxLines;
+
+  const _ExpandableText({required this.text, this.maxLines = 4});
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.text,
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.5,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white70
+                : Colors.black54,
+          ),
+          textAlign: TextAlign.justify,
+          maxLines: _isExpanded ? null : widget.maxLines,
+          overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+          child: Text(
+            _isExpanded ? 'See Less' : 'See More',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

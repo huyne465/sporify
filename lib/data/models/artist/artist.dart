@@ -7,6 +7,7 @@ class ArtistModel {
   final int? albums;
   final double? followers;
   final int? songs;
+  final String? describe;
 
   ArtistModel({
     this.id,
@@ -15,6 +16,7 @@ class ArtistModel {
     this.albums,
     this.followers,
     this.songs,
+    this.describe,
   });
 
   factory ArtistModel.fromFirestore(
@@ -28,6 +30,7 @@ class ArtistModel {
       albums: data['albums'] ?? 0,
       followers: (data['followers'] ?? 0.0).toDouble(),
       songs: data['songs'] ?? 0,
+      describe: data['describe'] ?? '',
     );
   }
 
@@ -38,6 +41,7 @@ class ArtistModel {
       'albums': albums,
       'followers': followers,
       'songs': songs,
+      'describe': describe,
     };
   }
 }
@@ -51,6 +55,7 @@ extension ArtistModelX on ArtistModel {
       albums: albums!,
       followers: followers!,
       songs: songs!,
+      describe: describe!,
     );
   }
 }

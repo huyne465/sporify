@@ -91,7 +91,7 @@ class ArtistList extends StatelessWidget {
 
   Widget _artistList(List<ArtistEntity> artists, BuildContext context) {
     return SizedBox(
-      height: 200,
+      height: 180,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         physics: const BouncingScrollPhysics(),
@@ -110,13 +110,13 @@ class ArtistList extends StatelessWidget {
             },
             child: Container(
               margin: const EdgeInsets.only(right: 16, top: 10, bottom: 10),
-              width: 140,
+              width: 120,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                    height: 140,
-                    width: 140,
+                    height: 120,
+                    width: 120,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(70),
                       boxShadow: [
