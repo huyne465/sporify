@@ -4,7 +4,7 @@ import 'package:sporify/domain/entities/songs/song.dart';
 class SongModel {
   String? title;
   String? artist;
-  num? duration;
+  double? duration;
   Timestamp? releaseDate;
   String? image;
   String? songUrl;

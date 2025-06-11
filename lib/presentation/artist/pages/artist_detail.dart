@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/domain/entities/artist/artist.dart';
+import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:sporify/presentation/artist/bloc/artist_songs_cubit.dart';
+import 'package:sporify/presentation/artist/bloc/artist_songs_state.dart';
 
 class ArtistDetailPage extends StatelessWidget {
   final ArtistEntity artist;
@@ -28,6 +32,8 @@ class ArtistDetailPage extends StatelessWidget {
               _buildArtistDescription(context),
               const SizedBox(height: 30),
               _buildArtistInfo(),
+              const SizedBox(height: 30),
+              _buildArtistSongs(context),
               const SizedBox(height: 30),
               _buildFollowButton(),
               const SizedBox(height: 20),
@@ -192,6 +198,204 @@ class ArtistDetailPage extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildArtistSongs(context) {
+    return BlocProvider(
+      create: (_) => ArtistSongsCubit()..getSongsByArtist(artist.name),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Popular Songs',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // Navigate to all songs by artist
+                  },
+                  child: Text(
+                    'See All',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          BlocBuilder<ArtistSongsCubit, ArtistSongsState>(
+            builder: (context, state) {
+              if (state is ArtistSongsLoading) {
+                return Container(
+                  height: 280,
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                    strokeWidth: 3,
+                  ),
+                );
+              }
+
+              if (state is ArtistSongsLoaded) {
+                if (state.songs.isEmpty) {
+                  return Container(
+                    height: 280,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'No songs found for ${artist.name}',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    ),
+                  );
+                }
+
+                return SizedBox(
+                  height: 280,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: state.songs.length,
+                    itemBuilder: (context, index) {
+                      return _buildSongCard(state.songs[index], context);
+                    },
+                  ),
+                );
+              }
+
+              if (state is ArtistSongsFailure) {
+                return Container(
+                  height: 280,
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.redAccent,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Failed to load songs',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        onPressed: () => context
+                            .read<ArtistSongsCubit>()
+                            .getSongsByArtist(artist.name),
+                        child: const Text(
+                          "Retry",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return Container();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSongCard(SongEntity song, context) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.only(right: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 160,
+            width: 160,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                song.image,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Icon(
+                        Icons.music_note,
+                        size: 60,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            song.title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black87,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            song.artist,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white70
+                  : Colors.black54,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+        ],
       ),
     );
   }

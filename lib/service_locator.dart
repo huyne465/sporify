@@ -21,6 +21,7 @@ import 'package:sporify/domain/usecases/lyrics/get_lyrics.dart';
 import 'package:sporify/domain/usecases/artist/get_artists.dart';
 import 'package:sporify/domain/usecases/artist/get_artist.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -35,6 +36,7 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SongRepository>(SongRepositoryImplementation());
   sl.registerSingleton<GetNewSongsUseCase>(GetNewSongsUseCase());
   sl.registerSingleton<GetPlayListUseCase>(GetPlayListUseCase());
+  sl.registerSingleton<GetSongsByArtistUseCase>(GetSongsByArtistUseCase());
   //add to add or remove favorite, is favorite
   sl.registerSingleton<AddOrRemoveSongUseCase>(AddOrRemoveSongUseCase());
   sl.registerSingleton<IsFavoriteUseCase>(IsFavoriteUseCase());

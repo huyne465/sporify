@@ -9,6 +9,7 @@ import 'package:sporify/service_locator.dart';
 abstract class SongFirebaseService {
   Future<Either<String, List<SongEntity>>> getNewsSongs();
   Future<Either<String, List<SongEntity>>> getPlayList();
+  Future<Either<String, List<SongEntity>>> getSongsByArtist(String artist);
   Future<Either> addOrRemoveFavoriteSong(String songId);
   Future<bool> isFavoriteSong(String songId);
 }
@@ -64,6 +65,38 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
       return right(songs);
     } catch (e) {
       print('Firebase error: $e'); // Add this for debugging
+      return left('An error occurred, Please try again');
+    }
+  }
+
+  @override
+  Future<Either<String, List<SongEntity>>> getSongsByArtist(
+    String artist,
+  ) async {
+    try {
+      List<SongEntity> songs = [];
+      var data = await FirebaseFirestore.instance
+          .collection('Songs')
+          .where('artist', isEqualTo: artist)
+          .limit(10)
+          .get();
+
+      for (var element in data.docs) {
+        var songModel = SongModel.fromJson(element.data());
+        bool isFavorite = await sl<IsFavoriteUseCase>().call(
+          params: element.reference.id,
+        );
+        songModel.isFavorite = isFavorite;
+        songModel.songId = element.reference.id;
+        songs.add(songModel.toEntity());
+      }
+
+      // Sort in memory if needed
+      songs.sort((a, b) => b.releaseDate.compareTo(a.releaseDate));
+
+      return right(songs);
+    } catch (e) {
+      print('Firebase error getting songs by artist: $e');
       return left('An error occurred, Please try again');
     }
   }
