@@ -201,11 +201,23 @@ class FavoritePage extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black,
               ),
               onPressed: () {
+                // Load song in global music player
                 context.read<GlobalMusicPlayerCubit>().loadSong(song);
+
+                // Navigate to song player
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => SongPlayerPage(songEntity: song),
+                  ),
+                );
+
+                // Show feedback
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Playing ${song.title}'),
+                    duration: const Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
                   ),
                 );
               },
@@ -213,6 +225,7 @@ class FavoritePage extends StatelessWidget {
           ],
         ),
         onTap: () {
+          // Load song and navigate on tile tap
           context.read<GlobalMusicPlayerCubit>().loadSong(song);
           Navigator.push(
             context,

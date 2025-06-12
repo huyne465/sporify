@@ -8,7 +8,6 @@ import 'package:sporify/core/configs/themes/app_theme.dart';
 import 'package:sporify/firebase_options.dart';
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
-import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
 import 'package:sporify/service_locator.dart';
 

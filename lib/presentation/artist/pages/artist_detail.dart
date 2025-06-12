@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
+import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/artist/artist.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/presentation/artist/bloc/artist_songs_cubit.dart';
 import 'package:sporify/presentation/artist/bloc/artist_songs_state.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/presentation/song_player/pages/song_player.dart';
 
 class ArtistDetailPage extends StatelessWidget {
   final ArtistEntity artist;
@@ -330,72 +333,125 @@ class ArtistDetailPage extends StatelessWidget {
   }
 
   Widget _buildSongCard(SongEntity song, context) {
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 160,
-            width: 160,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                song.image,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: const Center(
-                      child: Icon(
-                        Icons.music_note,
-                        size: 60,
-                        color: Colors.grey,
+    final imageUrl = AppUrls.getImageUrl(song.artist, song.title, song.image);
+
+    return GestureDetector(
+      onTap: () {
+        // Load song in global music player
+        context.read<GlobalMusicPlayerCubit>().loadSong(song);
+
+        // Navigate to song player
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => SongPlayerPage(songEntity: song),
+          ),
+        );
+
+        // Show feedback
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Playing ${song.title}'),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 160,
+              width: 160,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Icon(
+                              Icons.music_note,
+                              size: 60,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    // Play overlay
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.0),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            song.title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black87,
+            const SizedBox(height: 12),
+            Text(
+              song.title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black87,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            song.artist,
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white70
-                  : Colors.black54,
+            const SizedBox(height: 4),
+            Text(
+              song.artist,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black54,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-        ],
+            const SizedBox(height: 4),
+          ],
+        ),
       ),
     );
   }
