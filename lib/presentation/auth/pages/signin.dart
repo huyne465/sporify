@@ -12,6 +12,7 @@ import 'package:sporify/domain/usecases/auth/signin.dart';
 import 'package:sporify/presentation/auth/pages/signup.dart';
 import 'package:sporify/presentation/root/pages/main_navigation.dart';
 import 'package:sporify/service_locator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SignInPage extends StatelessWidget {
   SignInPage({super.key});
@@ -164,7 +165,9 @@ class SignInPage extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              await _launchSupportUrl(context);
+            },
             child: Text(
               'Click here',
               style: TextStyle(
@@ -298,5 +301,62 @@ class SignInPage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _launchSupportUrl(context) async {
+    final Uri url = Uri.parse('https://support.spotify.com/us/');
+
+    try {
+      // Try different launch modes for better compatibility
+      bool launched = false;
+
+      // First try: External application (default browser)
+      try {
+        launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        print('External launch failed: $e');
+      }
+
+      // Second try: Platform default
+      if (!launched) {
+        try {
+          launched = await launchUrl(url, mode: LaunchMode.platformDefault);
+        } catch (e) {
+          print('Platform default launch failed: $e');
+        }
+      }
+
+      // Third try: In-app web view as fallback
+      if (!launched) {
+        try {
+          launched = await launchUrl(url, mode: LaunchMode.inAppWebView);
+        } catch (e) {
+          print('In-app web view launch failed: $e');
+        }
+      }
+
+      // If all methods fail, show error
+      if (!launched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not open support page. Please check if you have a browser installed.',
+            ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle any unexpected errors
+      print('URL launch error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error opening support page: ${e.toString()}'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 }

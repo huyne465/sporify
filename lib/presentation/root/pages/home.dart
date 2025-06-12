@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/assets/app_images.dart';
@@ -11,6 +12,7 @@ import 'package:sporify/presentation/root/widgets/new_song.dart';
 import 'package:sporify/presentation/root/widgets/play_list.dart';
 import 'package:sporify/presentation/root/widgets/artist_list.dart';
 import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
+import 'package:sporify/presentation/auth/pages/change_password.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -263,11 +265,11 @@ class _HomePageState extends State<HomePage>
         height: 40,
         width: 40,
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: Colors.brown,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: Colors.brown.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -277,7 +279,7 @@ class _HomePageState extends State<HomePage>
           child: Text(
             initial,
             style: const TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -291,8 +293,10 @@ class _HomePageState extends State<HomePage>
     final user = FirebaseAuth.instance.currentUser;
     final String userName = user?.displayName ?? user?.email ?? 'User';
     final String userEmail = user?.email ?? '';
-    final String initial = userName.isNotEmpty
-        ? userName[0].toUpperCase()
+    final String initial = user?.displayName?.isNotEmpty == true
+        ? user!.displayName![0].toUpperCase()
+        : user?.email?.isNotEmpty == true
+        ? user!.email![0].toUpperCase()
         : 'U';
 
     return Drawer(
@@ -302,13 +306,10 @@ class _HomePageState extends State<HomePage>
           children: [
             // Profile Header
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 80),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(0.8),
-                    AppColors.primary,
-                  ],
+                  colors: [Colors.brown.withOpacity(0.8), Colors.black],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -333,7 +334,7 @@ class _HomePageState extends State<HomePage>
                       child: Text(
                         initial,
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: Colors.black,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                         ),
@@ -391,7 +392,12 @@ class _HomePageState extends State<HomePage>
                     title: 'Change Password',
                     onTap: () {
                       Navigator.pop(context);
-                      _showChangePasswordDialog();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChangePasswordPage(),
+                        ),
+                      );
                     },
                   ),
                   _buildDrawerItem(
@@ -411,15 +417,9 @@ class _HomePageState extends State<HomePage>
                   _buildDrawerItem(
                     icon: Icons.help_outline,
                     title: 'Help & Support',
-                    onTap: () {
+                    onTap: () async {
                       Navigator.pop(context);
-                      // Navigate to help page
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Help page coming soon'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                      await _launchSupportUrl();
                     },
                   ),
                   const Divider(height: 32),
@@ -545,129 +545,60 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  void _showChangePasswordDialog() {
-    final currentPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
+  Future<void> _launchSupportUrl() async {
+    final Uri url = Uri.parse('https://support.spotify.com/us/');
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: context.isDarkMode ? Colors.grey[900] : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'Change Password',
-            style: TextStyle(
-              color: context.isDarkMode ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
+    try {
+      // Try different launch modes for better compatibility
+      bool launched = false;
+
+      // First try: External application (default browser)
+      try {
+        launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        print('External launch failed: $e');
+      }
+
+      // Second try: Platform default
+      if (!launched) {
+        try {
+          launched = await launchUrl(url, mode: LaunchMode.platformDefault);
+        } catch (e) {
+          print('Platform default launch failed: $e');
+        }
+      }
+
+      // Third try: In-app web view as fallback
+      if (!launched) {
+        try {
+          launched = await launchUrl(url, mode: LaunchMode.inAppWebView);
+        } catch (e) {
+          print('In-app web view launch failed: $e');
+        }
+      }
+
+      // If all methods fail, show error
+      if (!launched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not open support page. Please check if you have a browser installed.',
             ),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 4),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: currentPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Current Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: confirmPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Confirm New Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: context.isDarkMode ? Colors.white70 : Colors.black54,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (newPasswordController.text !=
-                    confirmPasswordController.text) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Passwords do not match'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                  return;
-                }
-
-                try {
-                  final user = FirebaseAuth.instance.currentUser;
-                  if (user != null) {
-                    // Re-authenticate user
-                    final credential = EmailAuthProvider.credential(
-                      email: user.email!,
-                      password: currentPasswordController.text,
-                    );
-
-                    await user.reauthenticateWithCredential(credential);
-                    await user.updatePassword(newPasswordController.text);
-
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Password updated successfully'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: ${e.toString()}'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Update',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
         );
-      },
-    );
+      }
+    } catch (e) {
+      // Handle any unexpected errors
+      print('URL launch error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error opening support page: ${e.toString()}'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 }
