@@ -14,12 +14,27 @@ import 'package:sporify/presentation/root/pages/main_navigation.dart';
 import 'package:sporify/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
   SignupPage({super.key});
 
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
   final TextEditingController _fullname = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
+
+  bool _isPasswordVisible = false;
+
+  @override
+  void dispose() {
+    _fullname.dispose();
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,8 +135,20 @@ class SignupPage extends StatelessWidget {
   Widget _passWordField(BuildContext context) {
     return TextField(
       controller: _password,
-      decoration: const InputDecoration(
+      obscureText: !_isPasswordVisible,
+      decoration: InputDecoration(
         hintText: 'Password',
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: context.isDarkMode ? Colors.white70 : Colors.black54,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }
