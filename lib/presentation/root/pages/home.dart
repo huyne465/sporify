@@ -256,32 +256,34 @@ class _HomePageState extends State<HomePage>
         ? user!.email![0].toUpperCase()
         : 'U';
 
-    return GestureDetector(
-      onTap: () {
-        Scaffold.of(context).openDrawer();
-      },
-      child: Container(
-        margin: const EdgeInsets.only(left: 16),
-        height: 40,
-        width: 40,
-        decoration: BoxDecoration(
-          color: Colors.brown,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.brown.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            initial,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return Builder(
+      builder: (context) => GestureDetector(
+        onTap: () {
+          Scaffold.of(context).openDrawer();
+        },
+        child: Container(
+          margin: const EdgeInsets.only(left: 16),
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+            color: Colors.brown,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.brown.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              initial,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -380,9 +382,30 @@ class _HomePageState extends State<HomePage>
                       Navigator.pop(context);
                       // Navigate to profile page
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Profile page coming soon'),
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Profile page coming soon',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: AppColors.primary,
                           behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.all(16),
                         ),
                       );
                     },
@@ -407,9 +430,30 @@ class _HomePageState extends State<HomePage>
                       Navigator.pop(context);
                       // Navigate to settings page
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Settings page coming soon'),
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Settings page coming soon',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: AppColors.primary,
                           behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          margin: const EdgeInsets.all(16),
                         ),
                       );
                     },
@@ -580,12 +624,29 @@ class _HomePageState extends State<HomePage>
       // If all methods fail, show error
       if (!launched) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Could not open support page. Please check if you have a browser installed.',
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Could not open support page. Please check if you have a browser installed.',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
             behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       }
@@ -594,9 +655,28 @@ class _HomePageState extends State<HomePage>
       print('URL launch error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error opening support page: ${e.toString()}'),
+          content: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Error opening support page: ${e.toString()}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
         ),
       );
     }

@@ -36,13 +36,32 @@ class FavoriteButton extends StatelessWidget {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    isFavorite
-                        ? 'Removed from favorites'
-                        : 'Added to favorites',
+                  content: Row(
+                    children: [
+                      Icon(
+                        isFavorite ? Icons.heart_broken : Icons.favorite,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        isFavorite
+                            ? 'Removed from favorites'
+                            : 'Added to favorites',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
+                  backgroundColor: isFavorite ? Colors.orange : Colors.red,
                   duration: const Duration(seconds: 1),
                   behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(16),
                 ),
               );
             },

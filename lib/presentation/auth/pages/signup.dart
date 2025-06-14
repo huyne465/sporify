@@ -71,7 +71,33 @@ class _SignupPageState extends State<SignupPage> {
                   );
                   result.fold(
                     (l) {
-                      var snackBar = SnackBar(content: Text(l));
+                      var snackBar = SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                l,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                     (r) {
@@ -354,12 +380,29 @@ class _SignupPageState extends State<SignupPage> {
       // If all methods fail, show error
       if (!launched) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Could not open support page. Please check if you have a browser installed.',
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Could not open support page. Please check if you have a browser installed.',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
             behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       }
@@ -368,9 +411,28 @@ class _SignupPageState extends State<SignupPage> {
       print('URL launch error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error opening support page: ${e.toString()}'),
+          content: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Error opening support page: ${e.toString()}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
         ),
       );
     }

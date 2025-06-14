@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
+import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/data/repositories/favorite_songs_repository.dart';
 import 'package:sporify/presentation/favorite/bloc/favorite_songs_cubit.dart';
@@ -215,9 +216,26 @@ class FavoritePage extends StatelessWidget {
                 // Show feedback
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Playing ${song.title}'),
+                    content: Row(
+                      children: [
+                        Icon(Icons.music_note, color: Colors.white, size: 20),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Playing ${song.title}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: AppColors.primary,
                     duration: const Duration(seconds: 2),
                     behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.all(16),
                   ),
                 );
               },

@@ -256,18 +256,56 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         (failure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(failure),
+              content: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      failure,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
             ),
           );
         },
         (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(success),
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    success,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
             ),
           );
           Navigator.pop(context);

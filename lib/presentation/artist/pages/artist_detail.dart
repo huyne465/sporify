@@ -351,9 +351,26 @@ class ArtistDetailPage extends StatelessWidget {
         // Show feedback
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Playing ${song.title}'),
+            content: Row(
+              children: [
+                Icon(Icons.music_note, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Text(
+                  'Playing ${song.title}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.primary,
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
           ),
         );
       },
