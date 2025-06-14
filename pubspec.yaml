@@ -32,6 +32,7 @@ dependencies:
   just_audio: 
   http: ^1.4.0
   url_launcher:
+  google_sign_in: ^6.0.2
 
 dev_dependencies:
   flutter_test:

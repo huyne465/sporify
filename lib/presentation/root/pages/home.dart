@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sporify/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
@@ -13,6 +14,7 @@ import 'package:sporify/presentation/root/widgets/play_list.dart';
 import 'package:sporify/presentation/root/widgets/artist_list.dart';
 import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/auth/pages/change_password.dart';
+import 'package:sporify/domain/repository/auth/auth.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -563,14 +565,85 @@ class _HomePageState extends State<HomePage>
             ElevatedButton(
               onPressed: () async {
                 Navigator.pop(context);
-                await FirebaseAuth.instance.signOut();
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SignupOrSigninPage(),
-                  ),
-                  (route) => false,
+
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      backgroundColor: context.isDarkMode
+                          ? Colors.grey[900]
+                          : Colors.white,
+                      content: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: AppColors.primary),
+                          const SizedBox(width: 16),
+                          Text(
+                            'Signing out...',
+                            style: TextStyle(
+                              color: context.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 );
+
+                try {
+                  // Use repository sign out method which handles both Firebase and Google
+                  await sl<AuthRepository>().signOut();
+
+                  // Close loading dialog
+                  Navigator.pop(context);
+
+                  // Navigate to sign in page
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignupOrSigninPage(),
+                    ),
+                    (route) => false,
+                  );
+                } catch (e) {
+                  // Close loading dialog
+                  Navigator.pop(context);
+
+                  // Show error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Error signing out: ${e.toString()}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.all(16),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

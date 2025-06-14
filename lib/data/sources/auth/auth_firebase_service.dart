@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sporify/data/models/auth/create_user_request.dart';
 import 'package:sporify/data/models/auth/signin_user_request.dart';
 import 'package:sporify/data/models/auth/change_password_request.dart';
@@ -8,6 +9,7 @@ import 'package:sporify/data/models/auth/change_password_request.dart';
 abstract class AuthFirebaseService {
   Future<Either> signIn(SigninUserRequest signInReq);
   Future<Either> signUp(CreateUserRequest createUserReq);
+  Future<Either> signInWithGoogle();
   Future<Either> changePassword(ChangePasswordRequest changePasswordReq);
   Future<void> signOut();
 }
@@ -35,9 +37,21 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
   }
 
   @override
-  Future<void> signOut() {
-    // TODO: implement signOut
-    throw UnimplementedError();
+  Future<void> signOut() async {
+    try {
+      // Sign out from Google if user signed in with Google
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      if (await googleSignIn.isSignedIn()) {
+        await googleSignIn.signOut();
+      }
+
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      print('Error signing out: $e');
+      // Still sign out from Firebase even if Google sign-out fails
+      await FirebaseAuth.instance.signOut();
+    }
   }
 
   @override
@@ -104,6 +118,66 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       return Left(message);
     } catch (e) {
       return Left('An error occurred: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<Either> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        return const Left('Google sign-in was cancelled');
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+
+      // Save user data to Firestore if it's a new user
+      if (userCredential.additionalUserInfo?.isNewUser == true) {
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(userCredential.user?.uid)
+            .set({
+              'name': userCredential.user?.displayName ?? 'Google User',
+              'email': userCredential.user?.email,
+              'photoURL': userCredential.user?.photoURL,
+              'signInMethod': 'google',
+              'createdAt': Timestamp.now(),
+            });
+      }
+
+      return const Right('Google sign-in was successful');
+    } on FirebaseAuthException catch (e) {
+      String message = '';
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          message =
+              'An account already exists with the same email address but different sign-in credentials';
+          break;
+        case 'invalid-credential':
+          message = 'The credential received is malformed or has expired';
+          break;
+        default:
+          message = 'Google sign-in failed: ${e.message}';
+      }
+      return Left(message);
+    } catch (e) {
+      return Left('An error occurred during Google sign-in: ${e.toString()}');
     }
   }
 }

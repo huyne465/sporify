@@ -13,9 +13,8 @@ class AuthRepositoryImplementation extends AuthRepository {
   }
 
   @override
-  Future<void> signOut() {
-    // TODO: implement signOut
-    throw UnimplementedError();
+  Future<void> signOut() async {
+    return await sl<AuthFirebaseService>().signOut();
   }
 
   @override
@@ -26,5 +25,10 @@ class AuthRepositoryImplementation extends AuthRepository {
   @override
   Future<Either> changePassword(ChangePasswordRequest changePasswordReq) async {
     return await sl<AuthFirebaseService>().changePassword(changePasswordReq);
+  }
+
+  @override
+  Future<Either> signInWithGoogle() async {
+    return await sl<AuthFirebaseService>().signInWithGoogle();
   }
 }

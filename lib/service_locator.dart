@@ -23,6 +23,7 @@ import 'package:sporify/domain/usecases/artist/get_artist.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
+import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -32,6 +33,8 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SignupUseCase>(SignupUseCase());
   sl.registerSingleton<SignInUseCase>(SignInUseCase());
   sl.registerSingleton<ChangePasswordUseCase>(ChangePasswordUseCase());
+  // Use Cases
+  sl.registerSingleton<SignInWithGoogleUseCase>(SignInWithGoogleUseCase());
 
   //songs
   sl.registerSingleton<SongFirebaseService>(SongFirebaseServiceImpl());

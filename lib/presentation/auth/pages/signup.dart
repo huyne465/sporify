@@ -9,6 +9,7 @@ import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/data/models/auth/create_user_request.dart';
 import 'package:sporify/domain/usecases/auth/signup.dart';
+import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
 import 'package:sporify/presentation/auth/pages/signin.dart';
 import 'package:sporify/presentation/root/pages/main_navigation.dart';
 import 'package:sporify/service_locator.dart';
@@ -27,6 +28,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _password = TextEditingController();
 
   bool _isPasswordVisible = false;
+  bool _isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -299,16 +301,37 @@ class _SignupPageState extends State<SignupPage> {
         children: [
           _buildModeOption(
             icon: AppVectors.gmailIcon,
-            onTap: () {
-              print('object');
-            },
+            onTap: _isGoogleLoading ? null : _signInWithGoogle,
             context: context,
+            isLoading: _isGoogleLoading,
           ),
           const SizedBox(width: 75),
           _buildModeOption(
             icon: AppVectors.appleIcon,
             onTap: () {
-              print('object');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: Colors.white, size: 20),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Apple Sign-In coming soon',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: AppColors.primary,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                ),
+              );
             },
             context: context,
           ),
@@ -319,8 +342,9 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget _buildModeOption({
     required String icon,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     required BuildContext context,
+    bool isLoading = false,
   }) {
     final size = 80.0;
 
@@ -328,21 +352,99 @@ class _SignupPageState extends State<SignupPage> {
       children: [
         GestureDetector(
           onTap: onTap,
-          child: ClipOval(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Center(
-                child: SvgPicture.asset(
-                  icon,
-                  width: size * 0.5,
-                  height: size * 0.5,
-                ),
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: context.isDarkMode ? Colors.grey[800] : Colors.grey[100],
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: context.isDarkMode
+                    ? Colors.grey[600]!
+                    : Colors.grey[300]!,
+                width: 1,
               ),
             ),
+            child: isLoading
+                ? Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  )
+                : ClipOval(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          icon,
+                          width: size * 0.5,
+                          height: size * 0.5,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isGoogleLoading = true;
+    });
+
+    try {
+      var result = await sl<SignInWithGoogleUseCase>().call();
+
+      result.fold(
+        (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      failure,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
+          );
+        },
+        (success) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => const MainNavigationPage(),
+            ),
+            (route) => false,
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        _isGoogleLoading = false;
+      });
+    }
   }
 
   Future<void> _launchSupportUrl(context) async {
