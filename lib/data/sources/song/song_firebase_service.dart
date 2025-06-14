@@ -10,6 +10,7 @@ abstract class SongFirebaseService {
   Future<Either<String, List<SongEntity>>> getNewsSongs();
   Future<Either<String, List<SongEntity>>> getPlayList();
   Future<Either<String, List<SongEntity>>> getSongsByArtist(String artist);
+  Future<Either<String, List<SongEntity>>> searchSongs(String query);
   Future<Either> addOrRemoveFavoriteSong(String songId);
   Future<bool> isFavoriteSong(String songId);
 }
@@ -171,6 +172,76 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
     } catch (e) {
       print('Error checking favorite: $e'); // Thêm log để debug
       return false;
+    }
+  }
+
+  @override
+  Future<Either<String, List<SongEntity>>> searchSongs(String query) async {
+    try {
+      if (query.trim().isEmpty) {
+        return right([]);
+      }
+
+      List<SongEntity> songs = [];
+      String queryLower = query.toLowerCase();
+
+      // Search by title
+      var titleQuery = await FirebaseFirestore.instance
+          .collection('Songs')
+          .where('title', isGreaterThanOrEqualTo: queryLower)
+          .where('title', isLessThan: queryLower + 'z')
+          .limit(20)
+          .get();
+
+      // Search by artist
+      var artistQuery = await FirebaseFirestore.instance
+          .collection('Songs')
+          .where('artist', isGreaterThanOrEqualTo: queryLower)
+          .where('artist', isLessThan: queryLower + 'z')
+          .limit(20)
+          .get();
+
+      // Combine results and remove duplicates
+      Set<String> addedSongIds = {};
+
+      for (var element in [...titleQuery.docs, ...artistQuery.docs]) {
+        if (addedSongIds.contains(element.id)) continue;
+
+        var songModel = SongModel.fromJson(element.data());
+
+        // Filter by query match (case insensitive)
+        bool titleMatch =
+            songModel.title?.toLowerCase().contains(queryLower) ?? false;
+        bool artistMatch =
+            songModel.artist?.toLowerCase().contains(queryLower) ?? false;
+
+        if (titleMatch || artistMatch) {
+          bool isFavorite = await sl<IsFavoriteUseCase>().call(
+            params: element.reference.id,
+          );
+          songModel.isFavorite = isFavorite;
+          songModel.songId = element.reference.id;
+
+          songs.add(songModel.toEntity());
+          addedSongIds.add(element.id);
+        }
+      }
+
+      // Sort by relevance (title matches first, then artist matches)
+      songs.sort((a, b) {
+        bool aTitle = a.title.toLowerCase().contains(queryLower);
+        bool bTitle = b.title.toLowerCase().contains(queryLower);
+
+        if (aTitle && !bTitle) return -1;
+        if (!aTitle && bTitle) return 1;
+
+        return a.title.compareTo(b.title);
+      });
+
+      return right(songs);
+    } catch (e) {
+      print('Firebase search error: $e');
+      return left('Search failed, please try again');
     }
   }
 }

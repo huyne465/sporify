@@ -24,6 +24,7 @@ import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
 import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
+import 'package:sporify/domain/usecases/song/search_songs.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -42,6 +43,7 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<GetNewSongsUseCase>(GetNewSongsUseCase());
   sl.registerSingleton<GetPlayListUseCase>(GetPlayListUseCase());
   sl.registerSingleton<GetSongsByArtistUseCase>(GetSongsByArtistUseCase());
+  sl.registerSingleton<SearchSongsUseCase>(SearchSongsUseCase());
   //add to add or remove favorite, is favorite
   sl.registerSingleton<AddOrRemoveSongUseCase>(AddOrRemoveSongUseCase());
   sl.registerSingleton<IsFavoriteUseCase>(IsFavoriteUseCase());
