@@ -31,4 +31,19 @@ class AuthRepositoryImplementation extends AuthRepository {
   Future<Either> signInWithGoogle() async {
     return await sl<AuthFirebaseService>().signInWithGoogle();
   }
+
+  @override
+  Future<Either> signInWithFacebook() async {
+    return await sl<AuthFirebaseService>().signInWithFacebook();
+  }
+
+  @override
+  Future<Either> linkGoogleAccount() async {
+    return await sl<AuthFirebaseService>().linkGoogleAccount();
+  }
+
+  @override
+  Future<Either> linkFacebookAccount() async {
+    return await sl<AuthFirebaseService>().linkFacebookAccount();
+  }
 }

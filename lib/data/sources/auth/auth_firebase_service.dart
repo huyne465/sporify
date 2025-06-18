@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:sporify/data/models/auth/create_user_request.dart';
 import 'package:sporify/data/models/auth/signin_user_request.dart';
 import 'package:sporify/data/models/auth/change_password_request.dart';
@@ -10,8 +11,11 @@ abstract class AuthFirebaseService {
   Future<Either> signIn(SigninUserRequest signInReq);
   Future<Either> signUp(CreateUserRequest createUserReq);
   Future<Either> signInWithGoogle();
+  Future<Either> signInWithFacebook();
   Future<Either> changePassword(ChangePasswordRequest changePasswordReq);
   Future<void> signOut();
+  Future<Either> linkGoogleAccount();
+  Future<Either> linkFacebookAccount();
 }
 
 class AuthFirebaseServiceImpl extends AuthFirebaseService {
@@ -23,16 +27,24 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         password: signInReq.password,
       );
 
-      return const Right('Sign In was successful');
+      return const Right('Đăng nhập thành công');
     } on FirebaseException catch (e) {
       String message = '';
 
       if (e.code == 'invalid-email') {
-        message = 'Not found user with that email';
+        message = 'Không tìm thấy tài khoản với email này';
       } else if (e.code == 'invalid-credential') {
-        message = 'Wrong password provided for that user';
+        message = 'Email hoặc mật khẩu không chính xác';
+      } else if (e.code == 'user-disabled') {
+        message = 'Tài khoản này đã bị vô hiệu hóa';
+      } else if (e.code == 'too-many-requests') {
+        message = 'Quá nhiều lần thử. Vui lòng thử lại sau';
+      } else {
+        message = 'Đăng nhập thất bại: ${e.message}';
       }
       return Left(message);
+    } catch (e) {
+      return Left('Đã xảy ra lỗi trong quá trình đăng nhập: ${e.toString()}');
     }
   }
 
@@ -45,11 +57,17 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
         await googleSignIn.signOut();
       }
 
+      // Sign out from Facebook if user signed in with Facebook
+      final facebookAccessToken = await FacebookAuth.instance.accessToken;
+      if (facebookAccessToken != null) {
+        await FacebookAuth.instance.logOut();
+      }
+
       // Sign out from Firebase
       await FirebaseAuth.instance.signOut();
     } catch (e) {
       print('Error signing out: $e');
-      // Still sign out from Firebase even if Google sign-out fails
+      // Still sign out from Firebase even if social sign-out fails
       await FirebaseAuth.instance.signOut();
     }
   }
@@ -57,25 +75,54 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
   @override
   Future<Either> signUp(CreateUserRequest createUserReq) async {
     try {
+      // Check if email already exists with different sign-in methods
+      final signInMethods = await FirebaseAuth.instance
+          .fetchSignInMethodsForEmail(createUserReq.email);
+
+      if (signInMethods.isNotEmpty) {
+        if (signInMethods.contains('google.com')) {
+          return const Left(
+            'Email này đã được sử dụng với tài khoản Google. Vui lòng đăng nhập bằng Google.',
+          );
+        } else if (signInMethods.contains('facebook.com')) {
+          return const Left(
+            'Email này đã được sử dụng với tài khoản Facebook. Vui lòng đăng nhập bằng Facebook.',
+          );
+        } else if (signInMethods.contains('password')) {
+          return const Left(
+            'Tài khoản với email này đã tồn tại. Vui lòng đăng nhập.',
+          );
+        }
+      }
+
       var data = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: createUserReq.email,
         password: createUserReq.password,
       );
+
       FirebaseFirestore.instance.collection('Users').doc(data.user?.uid).set({
         'name': createUserReq.fullName,
         'email': data.user?.email,
+        'signInMethod': 'password',
+        'createdAt': Timestamp.now(),
       });
 
-      return const Right('SignUp was successful');
+      return const Right('Đăng ký thành công');
     } on FirebaseException catch (e) {
       String message = '';
 
-      if (e.code == 'week-password') {
-        message = 'The password provided is too weak';
+      if (e.code == 'weak-password') {
+        message = 'Mật khẩu quá yếu';
       } else if (e.code == 'email-already-in-use') {
-        message = 'An Account already exists with that email';
+        message = 'Email này đã được sử dụng cho tài khoản khác';
+      } else if (e.code == 'invalid-email') {
+        message = 'Định dạng email không hợp lệ';
+      } else {
+        message = 'Đăng ký thất bại: ${e.message}';
       }
       return Left(message);
+    } catch (e) {
+      return Left('Đã xảy ra lỗi trong quá trình đăng ký: ${e.toString()}');
     }
   }
 
@@ -164,20 +211,205 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       return const Right('Google sign-in was successful');
     } on FirebaseAuthException catch (e) {
       String message = '';
+
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          message =
-              'An account already exists with the same email address but different sign-in credentials';
+          // Get the email from the error to provide specific guidance
+          final email = e.email;
+          if (email != null) {
+            try {
+              final signInMethods = await FirebaseAuth.instance
+                  .fetchSignInMethodsForEmail(email);
+
+              if (signInMethods.contains('password')) {
+                message =
+                    'Tài khoản với email này đã được tạo bằng mật khẩu. Vui lòng đăng nhập bằng email và mật khẩu.';
+              } else if (signInMethods.contains('facebook.com')) {
+                message =
+                    'Tài khoản với email này đã được tạo bằng Facebook. Vui lòng đăng nhập bằng Facebook.';
+              } else {
+                message =
+                    'Tài khoản với email này đã tồn tại với phương thức đăng nhập khác.';
+              }
+            } catch (_) {
+              message =
+                  'Tài khoản với email này đã tồn tại với phương thức đăng nhập khác.';
+            }
+          } else {
+            message = 'Tài khoản đã tồn tại với phương thức đăng nhập khác.';
+          }
           break;
         case 'invalid-credential':
-          message = 'The credential received is malformed or has expired';
+          message = 'Thông tin xác thực Google không hợp lệ hoặc đã hết hạn';
+          break;
+        case 'operation-not-allowed':
+          message =
+              'Đăng nhập bằng Google chưa được kích hoạt cho ứng dụng này';
+          break;
+        case 'user-disabled':
+          message = 'Tài khoản này đã bị vô hiệu hóa';
           break;
         default:
-          message = 'Google sign-in failed: ${e.message}';
+          message = 'Đăng nhập Google thất bại: ${e.message}';
       }
       return Left(message);
     } catch (e) {
-      return Left('An error occurred during Google sign-in: ${e.toString()}');
+      return Left(
+        'Đã xảy ra lỗi trong quá trình đăng nhập Google: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<Either> signInWithFacebook() async {
+    try {
+      // Trigger the Facebook authentication flow
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status == LoginStatus.success) {
+        // Get the access token
+        final AccessToken accessToken = result.accessToken!;
+
+        // Create a credential from the access token
+        final OAuthCredential facebookAuthCredential =
+            FacebookAuthProvider.credential(accessToken.token);
+
+        // Sign in to Firebase with the Facebook credential
+        final UserCredential userCredential = await FirebaseAuth.instance
+            .signInWithCredential(facebookAuthCredential);
+
+        // Get Facebook user data
+        final Map<String, dynamic> userData = await FacebookAuth.instance
+            .getUserData();
+
+        // Save user data to Firestore if it's a new user
+        if (userCredential.additionalUserInfo?.isNewUser == true) {
+          await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(userCredential.user?.uid)
+              .set({
+                'name': userData['name'] ?? 'Facebook User',
+                'email': userData['email'] ?? userCredential.user?.email,
+                'photoURL': userData['picture']?['data']?['url'],
+                'signInMethod': 'facebook',
+                'facebookId': userData['id'],
+                'createdAt': Timestamp.now(),
+              });
+        }
+
+        return const Right('Facebook sign-in was successful');
+      } else if (result.status == LoginStatus.cancelled) {
+        return const Left('Đăng nhập Facebook đã bị hủy');
+      } else {
+        return Left('Đăng nhập Facebook thất bại: ${result.message}');
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = '';
+
+      switch (e.code) {
+        case 'account-exists-with-different-credential':
+          // Get the email from the error to provide specific guidance
+          final email = e.email;
+          if (email != null) {
+            try {
+              final signInMethods = await FirebaseAuth.instance
+                  .fetchSignInMethodsForEmail(email);
+
+              if (signInMethods.contains('password')) {
+                message =
+                    'Tài khoản với email này đã được tạo bằng mật khẩu. Vui lòng đăng nhập bằng email và mật khẩu.';
+              } else if (signInMethods.contains('google.com')) {
+                message =
+                    'Tài khoản với email này đã được tạo bằng Google. Vui lòng đăng nhập bằng Google.';
+              } else {
+                message =
+                    'Tài khoản với email này đã tồn tại với phương thức đăng nhập khác.';
+              }
+            } catch (_) {
+              message =
+                  'Tài khoản với email này đã tồn tại với phương thức đăng nhập khác.';
+            }
+          } else {
+            message = 'Tài khoản đã tồn tại với phương thức đăng nhập khác.';
+          }
+          break;
+        case 'invalid-credential':
+          message = 'Thông tin xác thực Facebook không hợp lệ hoặc đã hết hạn';
+          break;
+        case 'operation-not-allowed':
+          message =
+              'Đăng nhập bằng Facebook chưa được kích hoạt cho ứng dụng này';
+          break;
+        case 'user-disabled':
+          message = 'Tài khoản này đã bị vô hiệu hóa';
+          break;
+        default:
+          message = 'Đăng nhập Facebook thất bại: ${e.message}';
+      }
+      return Left(message);
+    } catch (e) {
+      return Left(
+        'Đã xảy ra lỗi trong quá trình đăng nhập Facebook: ${e.toString()}',
+      );
+    }
+  }
+
+  @override
+  Future<Either> linkGoogleAccount() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        return const Left('User not logged in');
+      }
+
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        return const Left('Google sign-in was cancelled');
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await user.linkWithCredential(credential);
+      return const Right('Google account linked successfully');
+    } catch (e) {
+      return Left('Failed to link Google account: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<Either> linkFacebookAccount() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        return const Left('User not logged in');
+      }
+
+      final LoginResult result = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile'],
+      );
+
+      if (result.status == LoginStatus.success) {
+        final AccessToken accessToken = result.accessToken!;
+        final OAuthCredential credential = FacebookAuthProvider.credential(
+          accessToken.token,
+        );
+
+        await user.linkWithCredential(credential);
+        return const Right('Facebook account linked successfully');
+      } else {
+        return const Left('Facebook authentication failed');
+      }
+    } catch (e) {
+      return Left('Failed to link Facebook account: ${e.toString()}');
     }
   }
 }

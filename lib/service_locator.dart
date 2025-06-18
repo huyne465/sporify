@@ -20,11 +20,12 @@ import 'package:sporify/domain/usecases/song/is_favorite.dart';
 import 'package:sporify/domain/usecases/lyrics/get_lyrics.dart';
 import 'package:sporify/domain/usecases/artist/get_artists.dart';
 import 'package:sporify/domain/usecases/artist/get_artist.dart';
+import 'package:sporify/domain/usecases/song/search_songs.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
 import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
-import 'package:sporify/domain/usecases/song/search_songs.dart';
+import 'package:sporify/domain/usecases/auth/signin_with_facebook.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -36,6 +37,7 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<ChangePasswordUseCase>(ChangePasswordUseCase());
   // Use Cases
   sl.registerSingleton<SignInWithGoogleUseCase>(SignInWithGoogleUseCase());
+  sl.registerSingleton<SignInWithFacebookUseCase>(SignInWithFacebookUseCase());
 
   //songs
   sl.registerSingleton<SongFirebaseService>(SongFirebaseServiceImpl());

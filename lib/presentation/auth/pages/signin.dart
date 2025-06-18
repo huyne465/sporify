@@ -10,6 +10,7 @@ import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/data/models/auth/signin_user_request.dart';
 import 'package:sporify/domain/usecases/auth/signin.dart';
 import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
+import 'package:sporify/domain/usecases/auth/signin_with_facebook.dart';
 import 'package:sporify/presentation/auth/pages/signup.dart';
 import 'package:sporify/presentation/root/pages/main_navigation.dart';
 import 'package:sporify/service_locator.dart';
@@ -28,6 +29,7 @@ class _SignInPageState extends State<SignInPage> {
 
   bool _isPasswordVisible = false;
   bool _isGoogleLoading = false;
+  bool _isFacebookLoading = false;
 
   @override
   void dispose() {
@@ -317,33 +319,10 @@ class _SignInPageState extends State<SignInPage> {
           ),
           const SizedBox(width: 75),
           _buildModeOption(
-            icon: AppVectors.appleIcon,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: Colors.white, size: 20),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Apple Sign-In coming soon',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: AppColors.primary,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  margin: const EdgeInsets.all(16),
-                ),
-              );
-            },
+            icon: AppVectors.fbIcon,
+            onTap: _isFacebookLoading ? null : _signInWithFacebook,
             context: context,
+            isLoading: _isFacebookLoading,
           ),
         ],
       ),
@@ -453,6 +432,59 @@ class _SignInPageState extends State<SignInPage> {
     } finally {
       setState(() {
         _isGoogleLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signInWithFacebook() async {
+    setState(() {
+      _isFacebookLoading = true;
+    });
+
+    try {
+      var result = await sl<SignInWithFacebookUseCase>().call();
+
+      result.fold(
+        (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      failure,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
+          );
+        },
+        (success) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => const MainNavigationPage(),
+            ),
+            (route) => false,
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        _isFacebookLoading = false;
       });
     }
   }

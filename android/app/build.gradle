@@ -36,16 +36,39 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.sporify"
+        applicationId "com.example.sporify"  // <-- Đây là Package Name
         minSdk 23
         targetSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
-    buildTypes {
+    signingConfigs {
+        debug {
+            storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
         release {
+            storeFile file("path/to/your/sporify-release-key.keystore")
+            storePassword "your_store_password"
+            keyAlias "sporify-key-alias"
+            keyPassword "your_key_password"
+        }
+    }
+
+    buildTypes {
+        debug {
             signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false  // Disable resource shrinking for debug builds
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false  // Enable code shrinking
+            shrinkResources false  // This can now work with minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -54,4 +77,6 @@ flutter {
     source "../.."
 }
 
-dependencies {}
+dependencies {
+    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+}
