@@ -22,55 +22,69 @@ class SongPlayerPage extends StatefulWidget {
 class _SongPlayerPageState extends State<SongPlayerPage> {
   bool isFavorite = false;
   bool _showLyrics = false;
+  late LyricsCubit _lyricsCubit;
+  String? _lastLoadedSongId;
 
   @override
   void initState() {
     super.initState();
+    _lyricsCubit = LyricsCubit();
+
     // Load song in global player if not already playing
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final globalCubit = context.read<GlobalMusicPlayerCubit>();
       if (globalCubit.state.currentSong?.songId != widget.songEntity.songId) {
         globalCubit.loadSong(widget.songEntity);
       }
+
+      // Load initial lyrics
+      final currentSong = globalCubit.state.currentSong ?? widget.songEntity;
+      _loadLyricsIfNeeded(currentSong);
     });
+  }
+
+  @override
+  void dispose() {
+    _lyricsCubit.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) {
-            final cubit = LyricsCubit();
-            cubit.getLyrics(widget.songEntity.artist, widget.songEntity.title);
-            return cubit;
-          },
-        ),
-      ],
-      child: Scaffold(
-        appBar: BasicAppBar(
-          title: Text('Now Playing', style: TextStyle(fontSize: 18)),
-          action: IconButton(
-            onPressed: () {
-              setState(() {
-                _showLyrics = !_showLyrics;
-              });
-            },
-            icon: Icon(_showLyrics ? Icons.music_note : Icons.lyrics),
+      providers: [BlocProvider.value(value: _lyricsCubit)],
+      child: BlocListener<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+        listener: (context, state) {
+          // Only update lyrics when song actually changes, not on every state change
+          if (state.currentSong != null) {
+            _loadLyricsIfNeeded(state.currentSong!);
+          }
+        },
+        child: Scaffold(
+          appBar: BasicAppBar(
+            title: Text('Now Playing', style: TextStyle(fontSize: 18)),
+            action: IconButton(
+              onPressed: () {
+                setState(() {
+                  _showLyrics = !_showLyrics;
+                });
+              },
+              icon: Icon(_showLyrics ? Icons.music_note : Icons.lyrics),
+            ),
           ),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                _songDetail(context),
-                _buildPlayerControls(),
-                if (_showLyrics) _buildLyricsSection(),
-                const SizedBox(
-                  height: 20,
-                ), // Reduced space since no mini player
-              ],
+          body: SafeArea(
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  _songDetail(context),
+                  _buildPlayerControls(),
+                  if (_showLyrics) _buildLyricsSection(),
+                  const SizedBox(
+                    height: 20,
+                  ), // Reduced space since no mini player
+                ],
+              ),
             ),
           ),
         ),
@@ -78,50 +92,83 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
     );
   }
 
-  Widget _songDetail(BuildContext context) {
-    final imageUrl = AppUrls.getImageUrl(
-      widget.songEntity.artist,
-      widget.songEntity.title,
-      widget.songEntity.image,
-    );
+  void _loadLyricsIfNeeded(SongEntity song) {
+    // Only load lyrics if the song has actually changed
+    if (_lastLoadedSongId != song.songId) {
+      _lastLoadedSongId = song.songId;
+      _lyricsCubit.getLyrics(song.artist, song.title);
+    }
+  }
 
-    return Column(
-      children: [
-        Container(
-          height: MediaQuery.of(context).size.width - 10,
-          margin: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: NetworkImage(imageUrl),
-              onError: (exception, stackTrace) =>
-                  const AssetImage('assets/images/default_cover.png'),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _songDetail(BuildContext context) {
+    return BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+      builder: (context, state) {
+        // Use current song from global state, fallback to widget song
+        final currentSong = state.currentSong ?? widget.songEntity;
+        final imageUrl = AppUrls.getImageUrl(
+          currentSong.artist,
+          currentSong.title,
+          currentSong.image,
+        );
+
+        return Column(
           children: [
-            Expanded(
+            Container(
+              height: MediaQuery.of(context).size.width - 10,
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(imageUrl),
+                  onError: (exception, stackTrace) =>
+                      const AssetImage('assets/images/default_cover.png'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      currentSong.title,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                      textAlign: TextAlign.left,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                FavoriteButton(songEntity: currentSong),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Align(
+              alignment: Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  widget.songEntity.title,
+                  currentSong.artist,
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey[600],
                   ),
                   textAlign: TextAlign.left,
                   maxLines: 1,
@@ -129,64 +176,46 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                 ),
               ),
             ),
-            FavoriteButton(songEntity: widget.songEntity),
-          ],
-        ),
-        const SizedBox(height: 5),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              widget.songEntity.artist,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.normal,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.left,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ), // Add playlist info
-        BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
-          builder: (context, state) {
-            final cubit = context.read<GlobalMusicPlayerCubit>();
-            final playlistInfo = cubit.currentPlaylistInfo;
+            // Add playlist info
+            BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+              builder: (context, state) {
+                final cubit = context.read<GlobalMusicPlayerCubit>();
+                final playlistInfo = cubit.currentPlaylistInfo;
 
-            if (playlistInfo.isNotEmpty) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      cubit.isPlaylistMode
-                          ? Icons.playlist_play
-                          : Icons.shuffle,
-                      size: 16,
-                      color: AppColors.primary,
+                if (playlistInfo.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      playlistInfo,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          cubit.isPlaylistMode
+                              ? Icons.playlist_play
+                              : Icons.shuffle,
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          playlistInfo,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }
-            return SizedBox.shrink();
-          },
-        ),
-      ],
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -312,11 +341,17 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   IconButton(
                     icon: Icon(Icons.playlist_add, color: Colors.grey[600]),
                     onPressed: () {
-                      // Show add to playlist dialog
+                      // Show add to playlist dialog - use current song from global state
+                      final currentSong =
+                          context
+                              .read<GlobalMusicPlayerCubit>()
+                              .state
+                              .currentSong ??
+                          widget.songEntity;
                       showDialog(
                         context: context,
                         builder: (context) =>
-                            AddToPlaylistDialog(song: widget.songEntity),
+                            AddToPlaylistDialog(song: currentSong),
                       );
                     },
                   ),
@@ -338,10 +373,11 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
   Widget _buildLyricsSection() {
     return BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
       builder: (context, state) {
+        final currentSong = state.currentSong ?? widget.songEntity;
         final imageUrl = AppUrls.getImageUrl(
-          widget.songEntity.artist,
-          widget.songEntity.title,
-          widget.songEntity.image,
+          currentSong.artist,
+          currentSong.title,
+          currentSong.image,
         );
 
         return Container(

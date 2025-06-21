@@ -30,7 +30,6 @@ import 'package:sporify/domain/usecases/auth/reset_password.dart';
 import 'package:sporify/data/repositories/playlist_repository.dart';
 import 'package:sporify/data/repositories/favorite_songs_repository.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
-import 'package:sporify/presentation/playlist/bloc/playlist_songs_cubit.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
