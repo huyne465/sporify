@@ -151,6 +151,41 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
             ),
           ),
         ),
+        // Add playlist info
+        BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+          builder: (context, state) {
+            final cubit = context.read<GlobalMusicPlayerCubit>();
+            final playlistInfo = cubit.currentPlaylistInfo;
+
+            if (playlistInfo.isNotEmpty && playlistInfo != 'Single track') {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.playlist_play,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      playlistInfo,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          },
+        ),
       ],
     );
   }

@@ -10,6 +10,7 @@ import 'package:sporify/data/repositories/playlist_repository.dart';
 import 'package:sporify/presentation/favorite/bloc/favorite_songs_cubit.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
 import 'package:sporify/presentation/playlist/widgets/create_playlist_dialog.dart';
+import 'package:sporify/presentation/playlist/pages/playlist_detail.dart';
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/song_player/pages/song_player.dart';
@@ -494,11 +495,10 @@ class _FavoritePageState extends State<FavoritePage>
           ],
         ),
         onTap: () {
-          // TODO: Navigate to playlist detail page
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Playlist detail page coming soon'),
-              backgroundColor: AppColors.primary,
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlaylistDetailPage(playlist: playlist),
             ),
           );
         },

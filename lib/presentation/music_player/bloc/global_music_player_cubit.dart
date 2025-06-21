@@ -32,12 +32,18 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
       emit(state.copyWith(position: updatedPosition));
     });
   }
-
   Future<void> loadSong(SongEntity song, {List<SongEntity>? songList}) async {
     if (songList != null) {
       playlist = songList;
       currentSongIndex = playlist.indexWhere((s) => s.songId == song.songId);
-      if (currentSongIndex == -1) currentSongIndex = 0;
+      if (currentSongIndex == -1) {
+        playlist.insert(0, song);
+        currentSongIndex = 0;
+      }
+    } else {
+      // If no playlist provided, create a single-song playlist
+      playlist = [song];
+      currentSongIndex = 0;
     }
 
     emit(
@@ -79,6 +85,18 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
   void seekTo(Duration position) {
     audioPlayer.seek(position);
   }
+
+  // Get current playlist info
+  String get currentPlaylistInfo {
+    if (playlist.isEmpty) return '';
+    if (playlist.length == 1) return 'Single track';
+    return 'Playlist • ${playlist.length} songs';
+  }
+
+  // Check if there are previous/next songs
+  bool get hasPrevious => playlist.isNotEmpty && currentSongIndex > 0;
+  bool get hasNext =>
+      playlist.isNotEmpty && currentSongIndex < playlist.length - 1;
 
   @override
   Future<void> close() {
