@@ -9,6 +9,8 @@ import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
 import 'package:sporify/presentation/lyrics/widgets/lyrics_view.dart';
+import 'package:sporify/common/widgets/playlist_button/add_to_playlist_button.dart';
+import 'package:sporify/presentation/playlist/widgets/add_to_playlist_dialog.dart';
 
 class SongPlayerPage extends StatefulWidget {
   final SongEntity songEntity;
@@ -282,7 +284,12 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   IconButton(
                     icon: Icon(Icons.playlist_add, color: Colors.grey[600]),
                     onPressed: () {
-                      // Add to playlist functionality
+                      // Show add to playlist dialog
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                            AddToPlaylistDialog(song: widget.songEntity),
+                      );
                     },
                   ),
                   IconButton(
