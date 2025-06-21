@@ -12,6 +12,7 @@ import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/root/widgets/new_song.dart';
 import 'package:sporify/presentation/root/widgets/play_list.dart';
 import 'package:sporify/presentation/root/widgets/artist_list.dart';
+import 'package:sporify/presentation/root/widgets/spotify_artist_list.dart';
 import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/auth/pages/change_password.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
@@ -78,9 +79,7 @@ class _HomePageState extends State<HomePage>
                           Container(child: Center(child: Text("Coming soon"))),
                         ],
                       ),
-                    ),
-
-                    // Add Top Artists section
+                    ), // Add Top Artists section
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 20,
@@ -98,7 +97,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                     ),
-                    const ArtistList(),
+                    const SpotifyArtistList(),
 
                     Padding(
                       padding: const EdgeInsets.only(
