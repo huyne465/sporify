@@ -175,9 +175,11 @@ class PlayList extends StatelessWidget {
                       );
                     },
                   ),
+                ), // Add heart icon for favorite feature
+                FavoriteButton(
+                  songEntity: songs[index],
+                  showPlaylistButton: true,
                 ),
-                // Add heart icon for favorite feature
-                FavoriteButton(songEntity: songs[index]),
                 // Play button
                 Container(
                   margin: const EdgeInsets.only(right: 13),

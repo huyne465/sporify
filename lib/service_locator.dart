@@ -27,6 +27,8 @@ import 'package:sporify/domain/usecases/auth/change_password.dart';
 import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
 import 'package:sporify/domain/usecases/auth/signin_with_facebook.dart';
 import 'package:sporify/domain/usecases/auth/reset_password.dart';
+import 'package:sporify/data/repositories/playlist_repository.dart';
+import 'package:sporify/data/repositories/favorite_songs_repository.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -40,6 +42,10 @@ Future<void> initializeDependencies() async {
   // Use Cases
   sl.registerSingleton<SignInWithGoogleUseCase>(SignInWithGoogleUseCase());
   sl.registerSingleton<SignInWithFacebookUseCase>(SignInWithFacebookUseCase());
+
+  //repositories
+  sl.registerSingleton<PlaylistRepository>(PlaylistRepository());
+  sl.registerSingleton<FavoriteSongsRepository>(FavoriteSongsRepository());
 
   //songs
   sl.registerSingleton<SongFirebaseService>(SongFirebaseServiceImpl());
