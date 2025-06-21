@@ -9,6 +9,7 @@ abstract class AuthRepository {
   Future<Either> signInWithGoogle();
   Future<Either> signInWithFacebook();
   Future<Either> changePassword(ChangePasswordRequest changePasswordReq);
+  Future<Either> resetPassword(String email);
   Future<Either> linkGoogleAccount();
   Future<Either> linkFacebookAccount();
   Future<void> signOut();

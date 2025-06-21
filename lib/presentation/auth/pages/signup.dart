@@ -25,6 +25,7 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final TextEditingController _fullname = TextEditingController();
+  final TextEditingController _username = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
@@ -35,6 +36,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   void dispose() {
     _fullname.dispose();
+    _username.dispose();
     _email.dispose();
     _password.dispose();
     super.dispose();
@@ -60,6 +62,8 @@ class _SignupPageState extends State<SignupPage> {
               const SizedBox(height: 15), // Reduced
               _fullNameField(context),
               const SizedBox(height: 16),
+              _usernameField(context),
+              const SizedBox(height: 16),
               _emailField(context),
               const SizedBox(height: 16),
               _passWordField(context),
@@ -69,6 +73,7 @@ class _SignupPageState extends State<SignupPage> {
                   var result = await sl<SignupUseCase>().call(
                     params: CreateUserRequest(
                       fullName: _fullname.text.toString(),
+                      username: _username.text.toString(),
                       email: _email.text.toString(),
                       password: _password.text.toString(),
                     ),
@@ -147,6 +152,16 @@ class _SignupPageState extends State<SignupPage> {
       controller: _fullname,
       decoration: const InputDecoration(
         hintText: 'Full Name',
+      ).applyDefaults(Theme.of(context).inputDecorationTheme),
+    );
+  }
+
+  //username
+  Widget _usernameField(BuildContext context) {
+    return TextField(
+      controller: _username,
+      decoration: const InputDecoration(
+        hintText: 'Username',
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
     );
   }

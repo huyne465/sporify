@@ -46,4 +46,9 @@ class AuthRepositoryImplementation extends AuthRepository {
   Future<Either> linkFacebookAccount() async {
     return await sl<AuthFirebaseService>().linkFacebookAccount();
   }
+
+  @override
+  Future<Either> resetPassword(String email) async {
+    return await sl<AuthFirebaseService>().resetPassword(email);
+  }
 }

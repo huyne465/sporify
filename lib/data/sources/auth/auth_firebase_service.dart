@@ -13,6 +13,7 @@ abstract class AuthFirebaseService {
   Future<Either> signInWithGoogle();
   Future<Either> signInWithFacebook();
   Future<Either> changePassword(ChangePasswordRequest changePasswordReq);
+  Future<Either> resetPassword(String email);
   Future<void> signOut();
   Future<Either> linkGoogleAccount();
   Future<Either> linkFacebookAccount();
@@ -22,29 +23,52 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
   @override
   Future<Either> signIn(SigninUserRequest signInReq) async {
     try {
+      String email = signInReq.email;
+
+      // Check if the input is an email or username
+      if (!signInReq.email.contains('@')) {
+        // It's a username, find the corresponding email
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('Users')
+            .where('username', isEqualTo: signInReq.email)
+            .limit(1)
+            .get();
+
+        if (querySnapshot.docs.isEmpty) {
+          return const Left('Username not found');
+        }
+
+        final userData = querySnapshot.docs.first.data();
+        email = userData['email'] ?? '';
+
+        if (email.isEmpty) {
+          return const Left('Invalid user data');
+        }
+      }
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: signInReq.email,
+        email: email,
         password: signInReq.password,
       );
 
-      return const Right('Đăng nhập thành công');
+      return const Right('Sign in successful');
     } on FirebaseException catch (e) {
       String message = '';
 
       if (e.code == 'invalid-email') {
-        message = 'Không tìm thấy tài khoản với email này';
+        message = 'No account found with this email';
       } else if (e.code == 'invalid-credential') {
-        message = 'Email hoặc mật khẩu không chính xác';
+        message = 'Email/username or password is incorrect';
       } else if (e.code == 'user-disabled') {
-        message = 'Tài khoản này đã bị vô hiệu hóa';
+        message = 'This account has been disabled';
       } else if (e.code == 'too-many-requests') {
-        message = 'Quá nhiều lần thử. Vui lòng thử lại sau';
+        message = 'Too many attempts. Please try again later';
       } else {
-        message = 'Đăng nhập thất bại: ${e.message}';
+        message = 'Sign in failed: ${e.message}';
       }
       return Left(message);
     } catch (e) {
-      return Left('Đã xảy ra lỗi trong quá trình đăng nhập: ${e.toString()}');
+      return Left('An error occurred during sign in: ${e.toString()}');
     }
   }
 
@@ -82,17 +106,30 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       if (signInMethods.isNotEmpty) {
         if (signInMethods.contains('google.com')) {
           return const Left(
-            'Email này đã được sử dụng với tài khoản Google. Vui lòng đăng nhập bằng Google.',
+            'This email is already used with Google account. Please sign in with Google.',
           );
         } else if (signInMethods.contains('facebook.com')) {
           return const Left(
-            'Email này đã được sử dụng với tài khoản Facebook. Vui lòng đăng nhập bằng Facebook.',
+            'This email is already used with Facebook account. Please sign in with Facebook.',
           );
         } else if (signInMethods.contains('password')) {
           return const Left(
-            'Tài khoản với email này đã tồn tại. Vui lòng đăng nhập.',
+            'Account with this email already exists. Please sign in.',
           );
         }
+      }
+
+      // Check if username already exists
+      final usernameQuery = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('username', isEqualTo: createUserReq.username)
+          .limit(1)
+          .get();
+
+      if (usernameQuery.docs.isNotEmpty) {
+        return const Left(
+          'Username already exists. Please choose a different username.',
+        );
       }
 
       var data = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -102,27 +139,28 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
 
       FirebaseFirestore.instance.collection('Users').doc(data.user?.uid).set({
         'name': createUserReq.fullName,
+        'username': createUserReq.username,
         'email': data.user?.email,
         'signInMethod': 'password',
         'createdAt': Timestamp.now(),
       });
 
-      return const Right('Đăng ký thành công');
+      return const Right('Sign up successful');
     } on FirebaseException catch (e) {
       String message = '';
 
       if (e.code == 'weak-password') {
-        message = 'Mật khẩu quá yếu';
+        message = 'Password is too weak';
       } else if (e.code == 'email-already-in-use') {
-        message = 'Email này đã được sử dụng cho tài khoản khác';
+        message = 'This email is already used for another account';
       } else if (e.code == 'invalid-email') {
-        message = 'Định dạng email không hợp lệ';
+        message = 'Invalid email format';
       } else {
-        message = 'Đăng ký thất bại: ${e.message}';
+        message = 'Sign up failed: ${e.message}';
       }
       return Left(message);
     } catch (e) {
-      return Left('Đã xảy ra lỗi trong quá trình đăng ký: ${e.toString()}');
+      return Left('An error occurred during sign up: ${e.toString()}');
     }
   }
 
@@ -410,6 +448,33 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       }
     } catch (e) {
       return Left('Failed to link Facebook account: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<Either> resetPassword(String email) async {
+    try {
+      print('🔥 Firebase resetPassword called with email: $email');
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      print('✅ Password reset email sent successfully');
+      return const Right('Password reset email sent successfully');
+    } on FirebaseAuthException catch (e) {
+      print('❌ FirebaseAuthException: ${e.code} - ${e.message}');
+      String message = '';
+
+      if (e.code == 'invalid-email') {
+        message = 'Invalid email address';
+      } else if (e.code == 'user-not-found') {
+        message = 'No user found with this email';
+      } else {
+        message = 'Failed to send password reset email: ${e.message}';
+      }
+      return Left(message);
+    } catch (e) {
+      print('❌ General exception: ${e.toString()}');
+      return Left(
+        'An error occurred while sending password reset email: ${e.toString()}',
+      );
     }
   }
 }
