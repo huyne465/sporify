@@ -9,7 +9,6 @@ import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
 import 'package:sporify/presentation/lyrics/widgets/lyrics_view.dart';
-import 'package:sporify/common/widgets/playlist_button/add_to_playlist_button.dart';
 import 'package:sporify/presentation/playlist/widgets/add_to_playlist_dialog.dart';
 
 class SongPlayerPage extends StatefulWidget {
@@ -150,14 +149,13 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-        ),
-        // Add playlist info
+        ), // Add playlist info
         BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
           builder: (context, state) {
             final cubit = context.read<GlobalMusicPlayerCubit>();
             final playlistInfo = cubit.currentPlaylistInfo;
 
-            if (playlistInfo.isNotEmpty && playlistInfo != 'Single track') {
+            if (playlistInfo.isNotEmpty) {
               return Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -166,7 +164,9 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.playlist_play,
+                      cubit.isPlaylistMode
+                          ? Icons.playlist_play
+                          : Icons.shuffle,
                       size: 16,
                       color: AppColors.primary,
                     ),
@@ -249,16 +249,13 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-
-              // Playback controls
+              const SizedBox(height: 20), // Playback controls
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   IconButton(
                     icon: Icon(Icons.skip_previous, size: 36),
-                    onPressed:
-                        cubit.playlist.isNotEmpty && cubit.currentSongIndex > 0
+                    onPressed: cubit.hasPrevious
                         ? () => cubit.playPrevious()
                         : null,
                   ),
@@ -289,11 +286,7 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.skip_next, size: 36),
-                    onPressed:
-                        cubit.playlist.isNotEmpty &&
-                            cubit.currentSongIndex < cubit.playlist.length - 1
-                        ? () => cubit.playNext()
-                        : null,
+                    onPressed: cubit.hasNext ? () => cubit.playNext() : null,
                   ),
                 ],
               ),

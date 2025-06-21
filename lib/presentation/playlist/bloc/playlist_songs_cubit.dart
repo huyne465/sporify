@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/domain/usecases/song/get_new_songs.dart';
 import 'package:sporify/service_locator.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_songs_state.dart';

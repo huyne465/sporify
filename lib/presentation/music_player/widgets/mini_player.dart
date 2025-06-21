@@ -118,15 +118,12 @@ class MiniPlayer extends StatelessWidget {
                 children: [
                   // Previous button
                   IconButton(
-                    onPressed:
-                        cubit.playlist.isNotEmpty && cubit.currentSongIndex > 0
+                    onPressed: cubit.hasPrevious
                         ? () => cubit.playPrevious()
                         : null,
                     icon: Icon(
                       Icons.skip_previous,
-                      color:
-                          cubit.playlist.isNotEmpty &&
-                              cubit.currentSongIndex > 0
+                      color: cubit.hasPrevious
                           ? (Theme.of(context).brightness == Brightness.dark
                                 ? Colors.white
                                 : Colors.black)
@@ -155,20 +152,12 @@ class MiniPlayer extends StatelessWidget {
                       ),
                       padding: EdgeInsets.zero,
                     ),
-                  ),
-
-                  // Next button
+                  ), // Next button
                   IconButton(
-                    onPressed:
-                        cubit.playlist.isNotEmpty &&
-                            cubit.currentSongIndex < cubit.playlist.length - 1
-                        ? () => cubit.playNext()
-                        : null,
+                    onPressed: cubit.hasNext ? () => cubit.playNext() : null,
                     icon: Icon(
                       Icons.skip_next,
-                      color:
-                          cubit.playlist.isNotEmpty &&
-                              cubit.currentSongIndex < cubit.playlist.length - 1
+                      color: cubit.hasNext
                           ? (Theme.of(context).brightness == Brightness.dark
                                 ? Colors.white
                                 : Colors.black)
