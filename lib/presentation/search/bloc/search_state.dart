@@ -1,4 +1,5 @@
 import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
 
 abstract class SearchState {}
 
@@ -11,6 +12,13 @@ class SearchLoaded extends SearchState {
   final String query;
 
   SearchLoaded({required this.songs, required this.query});
+}
+
+class SearchSpotifyArtistsLoaded extends SearchState {
+  final List<SpotifyArtistEntity> artists;
+  final String query;
+
+  SearchSpotifyArtistsLoaded({required this.artists, required this.query});
 }
 
 class SearchEmpty extends SearchState {

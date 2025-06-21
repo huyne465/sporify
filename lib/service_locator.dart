@@ -3,14 +3,17 @@ import 'package:sporify/data/repository/auth/auth_repository_implementation.dart
 import 'package:sporify/data/repository/song/song_repository_implentation.dart';
 import 'package:sporify/data/repository/lyrics/lyrics_repository_implementation.dart';
 import 'package:sporify/data/repository/artist/artist_repository_impl.dart';
+import 'package:sporify/data/repository/spotify/spotify_repository_impl.dart';
 import 'package:sporify/data/sources/artist/artist_firebase_service.dart';
 import 'package:sporify/data/sources/auth/auth_firebase_service.dart';
 import 'package:sporify/data/sources/song/song_firebase_service.dart';
 import 'package:sporify/data/sources/lyrics/lyrics_api_service.dart';
+import 'package:sporify/data/sources/spotify/spotify_api_service.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
 import 'package:sporify/domain/repository/song/song.dart';
 import 'package:sporify/domain/repository/lyrics/lyrics.dart';
 import 'package:sporify/domain/repository/artist/artist.dart';
+import 'package:sporify/domain/repository/spotify/spotify_repository.dart';
 import 'package:sporify/domain/usecases/auth/signin.dart';
 import 'package:sporify/domain/usecases/auth/signup.dart';
 import 'package:sporify/domain/usecases/song/add_or_remove_song.dart';
@@ -21,6 +24,8 @@ import 'package:sporify/domain/usecases/lyrics/get_lyrics.dart';
 import 'package:sporify/domain/usecases/artist/get_artists.dart';
 import 'package:sporify/domain/usecases/artist/get_artist.dart';
 import 'package:sporify/domain/usecases/song/search_songs.dart';
+import 'package:sporify/domain/usecases/spotify/search_spotify_artists.dart';
+import 'package:sporify/domain/usecases/spotify/get_artist_top_tracks.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
@@ -75,4 +80,18 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<ArtistRepository>(ArtistRepositoryImpl());
   sl.registerSingleton<GetArtistsUseCase>(GetArtistsUseCase());
   sl.registerSingleton<GetArtistUseCase>(GetArtistUseCase());
+
+  // Spotify services
+  sl.registerSingleton<SpotifyApiService>(SpotifyApiServiceImpl());
+  sl.registerSingleton<SpotifyRepository>(
+    SpotifyRepositoryImpl(spotifyApiService: sl<SpotifyApiService>()),
+  );
+
+  // Spotify use cases
+  sl.registerSingleton<SearchSpotifyArtistsUseCase>(
+    SearchSpotifyArtistsUseCase(),
+  );
+  sl.registerSingleton<GetSpotifyArtistTopTracksUseCase>(
+    GetSpotifyArtistTopTracksUseCase(),
+  );
 }
