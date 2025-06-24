@@ -89,7 +89,6 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SpotifyRepository>(
     SpotifyRepositoryImpl(spotifyApiService: sl<SpotifyApiService>()),
   );
-
   // Spotify use cases
   sl.registerSingleton<SearchSpotifyArtistsUseCase>(
     SearchSpotifyArtistsUseCase(),
