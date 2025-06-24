@@ -27,7 +27,6 @@ import 'package:sporify/domain/usecases/song/search_songs.dart';
 import 'package:sporify/domain/usecases/spotify/search_spotify_artists.dart';
 import 'package:sporify/domain/usecases/spotify/get_artist_top_tracks.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_artists.dart';
-import 'package:sporify/domain/usecases/spotify/get_popular_albums.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_tracks.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';

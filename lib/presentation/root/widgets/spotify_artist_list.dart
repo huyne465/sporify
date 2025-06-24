@@ -144,9 +144,11 @@ class SpotifyArtistList extends StatelessWidget {
                       borderRadius: BorderRadius.circular(60),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
+                          color: context.isDarkMode
+                              ? Colors.grey.withOpacity(0.2)
+                              : Colors.black.withOpacity(0.3),
+                          blurRadius: 5,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
@@ -220,7 +222,7 @@ class SpotifyArtistList extends StatelessWidget {
                     '${_formatNumber(artist.followers)} followers',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.primary,
+                      color: context.isDarkMode ? Colors.white70 : Colors.black,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
