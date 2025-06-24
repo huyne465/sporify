@@ -9,7 +9,7 @@ class GetPopularAlbumsUseCase
   Future<List<SpotifyAlbumEntity>> call({void params}) async {
     // Lấy albums từ các artist phổ biến
     const popularArtistIds = [
-      '66CXWjxzNUsdJxJ2JdwvnR', // Ariana Grande
+      '03ZYR4zwCrkSsXTROnK2d0', // obito
       '06HL4z0CvFAx86XM2NjONE', // Taylor Swift
       '6eUKZXaKkcviH0Ku9w2n3V', // Ed Sheeran
       '6qqNVTkY8uBg9cP3Jd7DAH', // Billie Eilish
