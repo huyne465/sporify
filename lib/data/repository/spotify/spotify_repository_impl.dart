@@ -53,8 +53,21 @@ class SpotifyRepositoryImpl extends SpotifyRepository {
   }
 
   @override
-  Future<List<SpotifyAlbumEntity>> getArtistAlbums(String artistId) {
-    // TODO: implement getArtistAlbums
-    throw UnimplementedError();
+  Future<List<SpotifyAlbumEntity>> getArtistAlbums(String artistId) async {
+    final albumModels = await spotifyApiService.getArtistAlbums(artistId);
+
+    return albumModels
+        .map(
+          (model) => SpotifyAlbumEntity(
+            id: model.id,
+            name: model.name,
+            imageUrl: model.images.isNotEmpty ? model.images.first.url : '',
+            albumType: model.albumType,
+            releaseDate: model.releaseDate,
+            totalTracks: model.totalTracks,
+            spotifyUrl: model.spotifyUrl,
+          ),
+        )
+        .toList();
   }
 }

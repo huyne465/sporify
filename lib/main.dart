@@ -12,19 +12,52 @@ import 'package:sporify/presentation/splash/pages/splash.dart';
 import 'package:sporify/service_locator.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    print('🚀 App starting...');
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Correct way to initialize HydratedStorage
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb
-        ? HydratedStorage.webStorageDirectory
-        : await getApplicationDocumentsDirectory(),
-  );
+    print('💾 Initializing HydratedStorage...');
+    // Correct way to initialize HydratedStorage
+    HydratedBloc.storage = await HydratedStorage.build(
+      storageDirectory: kIsWeb
+          ? HydratedStorage.webStorageDirectory
+          : await getApplicationDocumentsDirectory(),
+    );
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await initializeDependencies();
+    print('🔥 Initializing Firebase...');
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  runApp(const MyApp());
+    print('📦 Initializing Dependencies...');
+    await initializeDependencies();
+
+    print('✅ App initialized successfully');
+    runApp(const MyApp());
+  } catch (e, stackTrace) {
+    print('❗ Error during app initialization: $e');
+    print('📍 Stack trace: $stackTrace');
+
+    // Run app anyway với error handling
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error, size: 64, color: Colors.red),
+                SizedBox(height: 16),
+                Text('App initialization failed'),
+                SizedBox(height: 8),
+                Text('Error: $e', style: TextStyle(fontSize: 12)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {

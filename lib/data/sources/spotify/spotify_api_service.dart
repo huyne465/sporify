@@ -3,11 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:sporify/data/models/spotify/spotify_artist.dart';
 import 'package:sporify/core/configs/constants/app_spotify_keys.dart';
 
-abstract class SpotifyApiService {
-  Future<List<SpotifyArtistModel>> searchArtists(String query);
-  Future<List<SpotifyTrackModel>> getArtistTopTracks(String artistId);
-}
-
 class SpotifyApiServiceImpl extends SpotifyApiService {
   final String baseUrl = 'https://api.spotify.com/v1';
   String? _accessToken;
@@ -105,4 +100,37 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
       throw Exception('Error getting artist top tracks: $e');
     }
   }
+
+  @override
+  Future<List<SpotifyAlbumModel>> getArtistAlbums(String artistId) async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) throw Exception('Failed to get access token');
+
+      final response = await http.get(
+        Uri.parse(
+          '$baseUrl/artists/$artistId/albums?market=US&limit=20&include_groups=album',
+        ),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final albums = data['items'] as List<dynamic>;
+        return albums
+            .map((album) => SpotifyAlbumModel.fromJson(album))
+            .toList();
+      } else {
+        throw Exception('Failed to get artist albums');
+      }
+    } catch (e) {
+      throw Exception('Error getting artist albums: $e');
+    }
+  }
+}
+
+abstract class SpotifyApiService {
+  Future<List<SpotifyArtistModel>> searchArtists(String query);
+  Future<List<SpotifyTrackModel>> getArtistTopTracks(String artistId);
+  Future<List<SpotifyAlbumModel>> getArtistAlbums(String artistId);
 }

@@ -12,6 +12,12 @@ class SpotifyArtistTopTracksLoaded extends SpotifyArtistState {
   SpotifyArtistTopTracksLoaded({required this.tracks});
 }
 
+class SpotifyPopularArtistsLoaded extends SpotifyArtistState {
+  final List<SpotifyArtistEntity> artists;
+
+  SpotifyPopularArtistsLoaded({required this.artists});
+}
+
 class SpotifyArtistError extends SpotifyArtistState {
   final String message;
 

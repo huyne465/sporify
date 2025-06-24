@@ -25,24 +25,45 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> redirect() async {
-    // Wait for Firebase Auth to initialize
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      print('🚀 Starting app initialization...');
 
-    // Check if user is currently signed in
-    final User? currentUser = FirebaseAuth.instance.currentUser;
+      // Wait for Firebase Auth to initialize
+      await Future.delayed(const Duration(seconds: 2));
 
-    if (!mounted) return;
+      print('🔐 Checking Firebase Auth...');
+      // Check if user is currently signed in
+      final User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (currentUser != null) {
-      // User is signed in, navigate to main app
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => const MainNavigationPage(),
-        ),
-      );
-    } else {
-      // User is not signed in, navigate to get started page
+      print('👤 Current user: ${currentUser?.email ?? 'Not signed in'}');
+
+      if (!mounted) return;
+
+      if (currentUser != null) {
+        print('✅ User signed in, navigating to main app...');
+        // User is signed in, navigate to main app
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const MainNavigationPage(),
+          ),
+        );
+      } else {
+        print('❌ User not signed in, navigating to get started...');
+        // User is not signed in, navigate to get started page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => const GetStartedPage(),
+          ),
+        );
+      }
+    } catch (e) {
+      print('❗ Error in splash redirect: $e');
+
+      if (!mounted) return;
+
+      // Fallback navigation
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

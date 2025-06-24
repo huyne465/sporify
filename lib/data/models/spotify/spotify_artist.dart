@@ -84,11 +84,19 @@ class SpotifyAlbumModel {
   final String id;
   final String name;
   final List<SpotifyImageModel> images;
+  final String albumType;
+  final String releaseDate;
+  final int totalTracks;
+  final String spotifyUrl;
 
   SpotifyAlbumModel({
     required this.id,
     required this.name,
     required this.images,
+    required this.albumType,
+    required this.releaseDate,
+    required this.totalTracks,
+    required this.spotifyUrl,
   });
 
   factory SpotifyAlbumModel.fromJson(Map<String, dynamic> json) {
@@ -100,6 +108,10 @@ class SpotifyAlbumModel {
               ?.map((img) => SpotifyImageModel.fromJson(img))
               .toList() ??
           [],
+      albumType: json['album_type'] ?? '',
+      releaseDate: json['release_date'] ?? '',
+      totalTracks: json['total_tracks'] ?? 0,
+      spotifyUrl: json['external_urls']?['spotify'] ?? '',
     );
   }
 }

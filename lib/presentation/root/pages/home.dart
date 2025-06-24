@@ -15,6 +15,9 @@ import 'package:sporify/presentation/root/widgets/artist_list.dart';
 import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/auth/pages/change_password.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
+import 'package:sporify/presentation/root/widgets/spotify_artist_list.dart';
+import 'package:sporify/presentation/root/widgets/spotify_albums_list.dart';
+import 'package:sporify/presentation/root/widgets/spotify_popular_tracks.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -79,8 +82,7 @@ class _HomePageState extends State<HomePage>
                         ],
                       ),
                     ),
-
-                    // Add Top Artists section
+                    // Add Spotify Popular Artists section
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 20,
@@ -88,7 +90,111 @@ class _HomePageState extends State<HomePage>
                         bottom: 15,
                       ),
                       child: Text(
-                        "Popular Artists",
+                        "Popular Artists on Spotify",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: context.isDarkMode
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
+                    ),
+                    const SpotifyArtistList(), // ✅ Đã gọi
+                    // Add Top Tracks section
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        top: 20,
+                        bottom: 15,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Top Tracks",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              color: context.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('All tracks page coming soon'),
+                                  backgroundColor: AppColors.primary,
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'See All',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 300,
+                      child: const SpotifyPopularTracks(),
+                    ), // ✅ Đã gọi và hoạt động
+                    // Add Popular Albums section
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        top: 20,
+                        bottom: 15,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Popular Albums",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              color: context.isDarkMode
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('All albums page coming soon'),
+                                  backgroundColor: AppColors.primary,
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'See All',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SpotifyAlbumsList(), // ✅ Đã gọi nhưng chưa có data
+                    // Add Local Artists section
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        top: 20,
+                        bottom: 15,
+                      ),
+                      child: Text(
+                        "Local Artists",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
