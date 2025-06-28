@@ -31,13 +31,24 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
         error = null;
       });
 
+      print('🎵 Loading albums...');
+
+      // Kiểm tra xem UseCase đã được đăng ký chưa
+      if (!sl.isRegistered<GetPopularAlbumsUseCase>()) {
+        throw Exception(
+          'GetPopularAlbumsUseCase chưa được đăng ký trong service locator',
+        );
+      }
+
       final loadedAlbums = await sl<GetPopularAlbumsUseCase>().call();
+      print('✅ Loaded ${loadedAlbums.length} albums');
 
       setState(() {
         albums = loadedAlbums;
         isLoading = false;
       });
     } catch (e) {
+      print('❌ Error loading albums: $e');
       setState(() {
         error = e.toString();
         isLoading = false;
@@ -118,8 +129,9 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Giảm height của image container
             Container(
-              height: 160,
+              height: 140, // Giảm từ 160 xuống 140
               width: 160,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
@@ -141,6 +153,18 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                           ? album.imageUrl
                           : 'https://via.placeholder.com/160',
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.grey[300],
                         child: Icon(Icons.album, size: 60, color: Colors.grey),
@@ -174,24 +198,46 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              album.name,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: context.isDarkMode ? Colors.white : Colors.black,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${album.totalTracks} tracks',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
+            const SizedBox(height: 8), // Giảm từ 10 xuống 8
+            // Wrap text trong Expanded để tránh overflow
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    album.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13, // Giảm font size từ 14 xuống 13
+                      color: context.isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2), // Giảm từ 4 xuống 2
+                  // Hiển thị artist name nếu có
+                  if (album.artists.isNotEmpty)
+                    Text(
+                      album.artists.first,
+                      style: TextStyle(
+                        fontSize: 11, // Giảm từ 12 xuống 11
+                        color: context.isDarkMode
+                            ? Colors.white70
+                            : Colors.black54,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  const SizedBox(height: 1), // Giảm từ 2 xuống 1
+                  Text(
+                    '${album.totalTracks} tracks',
+                    style: TextStyle(
+                      fontSize: 10, // Giảm từ 11 xuống 10
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

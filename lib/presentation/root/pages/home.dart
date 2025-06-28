@@ -185,7 +185,11 @@ class _HomePageState extends State<HomePage>
                         ],
                       ),
                     ),
-                    const SpotifyAlbumsList(), // ✅ Đã gọi nhưng chưa có data
+                    // Tăng height container để chứa albums
+                    SizedBox(
+                      height: 220, // Tăng từ 200 lên 220
+                      child: const SpotifyAlbumsList(),
+                    ), // ✅ Đã gọi nhưng chưa có data
                     // Add Local Artists section
                     Padding(
                       padding: const EdgeInsets.only(

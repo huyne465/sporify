@@ -15,6 +15,7 @@ class GetPopularArtistsUseCase
       'Billie Eilish',
       'The Weeknd',
       'Drake',
+      'Travis Scott',
       'Low G',
       'Đen',
       'Sơn Tùng M-TP',

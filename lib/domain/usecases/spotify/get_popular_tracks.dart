@@ -33,8 +33,8 @@ class GetPopularTracksUseCase
     // You can also include other Vietnamese artists:
     // '1zFt2gGBH04JTZ5rdmHXWY' - Sơn Tùng M-TP
     // '0LyfQWJT6nXafLPZqxe9Of' - Suboi
-    const String defaultArtistId = '66CXWjxzNUsdJxJ2JdwvnR'; // Ariana Grande
-    const String defaultCountryCode = 'US'; // Default market for top tracks
-    return sl<SpotifyRepository>().getArtistTopTracks('6eUKZXaKkcviH0Ku9w2n3V');
+    // const String defaultArtistId = '66CXWjxzNUsdJxJ2JdwvnR'; // Ariana Grande
+    // const String defaultCountryCode = 'US'; // Default market for top tracks
+    return sl<SpotifyRepository>().getArtistTopTracks('0Y5tJX1MQlPlqiwlOH1tJY');
   }
 }

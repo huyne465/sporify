@@ -5,4 +5,5 @@ abstract class SpotifyRepository {
   Future<SpotifyArtistEntity?> getArtist(String artistId);
   Future<List<SpotifyTrackEntity>> getArtistTopTracks(String artistId);
   Future<List<SpotifyAlbumEntity>> getArtistAlbums(String artistId);
+  Future<List<SpotifyAlbumEntity>> getSeveralAlbums(String popularAlbumIds);
 }

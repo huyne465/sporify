@@ -127,10 +127,42 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
       throw Exception('Error getting artist albums: $e');
     }
   }
+
+  @override
+  Future<List<SpotifyAlbumModel>> getSeveralAlbums(
+    List<String> albumIds,
+  ) async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) throw Exception('Failed to get access token');
+
+      // Join album IDs with comma, max 20 albums per request
+      final ids = albumIds.take(20).join(',');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/albums?ids=${Uri.encodeComponent(ids)}'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final albums = data['albums'] as List<dynamic>;
+        return albums
+            .where((album) => album != null) // Filter out null albums
+            .map((album) => SpotifyAlbumModel.fromJson(album))
+            .toList();
+      } else {
+        throw Exception('Failed to get several albums: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting several albums: $e');
+    }
+  }
 }
 
 abstract class SpotifyApiService {
   Future<List<SpotifyArtistModel>> searchArtists(String query);
   Future<List<SpotifyTrackModel>> getArtistTopTracks(String artistId);
   Future<List<SpotifyAlbumModel>> getArtistAlbums(String artistId);
+  Future<List<SpotifyAlbumModel>> getSeveralAlbums(List<String> albumIds);
 }

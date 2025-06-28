@@ -44,6 +44,7 @@ class SpotifyAlbumEntity {
   final String releaseDate;
   final int totalTracks;
   final String spotifyUrl;
+  final List<String> artists;
 
   SpotifyAlbumEntity({
     required this.id,
@@ -53,5 +54,6 @@ class SpotifyAlbumEntity {
     required this.releaseDate,
     required this.totalTracks,
     required this.spotifyUrl,
+    required this.artists,
   });
 }
