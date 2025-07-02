@@ -158,6 +158,7 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
       throw Exception('Error getting several albums: $e');
     }
   }
+<<<<<<< HEAD
 
   @override
   Future<SpotifyTrackModel> getTrack(String trackId) async {
@@ -211,6 +212,8 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
       throw Exception('Error getting several tracks: $e');
     }
   }
+=======
+>>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
 }
 
 abstract class SpotifyApiService {
@@ -218,6 +221,9 @@ abstract class SpotifyApiService {
   Future<List<SpotifyTrackModel>> getArtistTopTracks(String artistId);
   Future<List<SpotifyAlbumModel>> getArtistAlbums(String artistId);
   Future<List<SpotifyAlbumModel>> getSeveralAlbums(List<String> albumIds);
+<<<<<<< HEAD
   Future<SpotifyTrackModel> getTrack(String trackId);
   Future<List<SpotifyTrackModel>> getSeveralTracks(List<String> trackIds);
+=======
+>>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
 }

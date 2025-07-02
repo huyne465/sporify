@@ -109,6 +109,26 @@ class SpotifyArtistSimpleModel {
   }
 }
 
+class SpotifyArtistSimpleModel {
+  final String id;
+  final String name;
+  final String spotifyUrl;
+
+  SpotifyArtistSimpleModel({
+    required this.id,
+    required this.name,
+    required this.spotifyUrl,
+  });
+
+  factory SpotifyArtistSimpleModel.fromJson(Map<String, dynamic> json) {
+    return SpotifyArtistSimpleModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      spotifyUrl: json['external_urls']?['spotify'] ?? '',
+    );
+  }
+}
+
 class SpotifyAlbumModel {
   final String id;
   final String name;

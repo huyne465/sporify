@@ -94,6 +94,7 @@ class _HomePageState extends State<HomePage>
                       onSeeAll: () =>
                           _showComingSoonSnackBar("All artists page"),
                     ),
+<<<<<<< HEAD
                     const SpotifyArtistList(),
 
                     // Top Tracks section
@@ -113,6 +114,14 @@ class _HomePageState extends State<HomePage>
                     SizedBox(height: 220, child: const SpotifyAlbumsList()),
 
                     // Local Artists section
+=======
+                    // Tăng height container để chứa albums
+                    SizedBox(
+                      height: 220, // Tăng từ 200 lên 220
+                      child: const SpotifyAlbumsList(),
+                    ), // ✅ Đã gọi nhưng chưa có data
+                    // Add Local Artists section
+>>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 20,
