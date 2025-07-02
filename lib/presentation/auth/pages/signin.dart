@@ -18,7 +18,7 @@ import 'package:sporify/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignInPage extends StatefulWidget {
-  SignInPage({super.key});
+  const SignInPage({super.key});
 
   @override
   State<SignInPage> createState() => _SignInPageState();

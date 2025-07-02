@@ -31,13 +31,23 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
         error = null;
       });
 
+      print('🎵 Loading albums...');
+
+      if (!sl.isRegistered<GetPopularAlbumsUseCase>()) {
+        throw Exception(
+          'GetPopularAlbumsUseCase chưa được đăng ký trong service locator',
+        );
+      }
+
       final loadedAlbums = await sl<GetPopularAlbumsUseCase>().call();
+      print('✅ Loaded ${loadedAlbums.length} albums');
 
       setState(() {
         albums = loadedAlbums;
         isLoading = false;
       });
     } catch (e) {
+      print('❌ Error loading albums: $e');
       setState(() {
         error = e.toString();
         isLoading = false;
@@ -48,7 +58,7 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Container(
+      return SizedBox(
         height: 200,
         child: Center(
           child: CircularProgressIndicator(color: AppColors.primary),
@@ -72,11 +82,11 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
             const SizedBox(height: 8),
             ElevatedButton(
               onPressed: _loadAlbums,
-              child: Text('Retry'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
+              child: Text('Retry'),
             ),
           ],
         ),
@@ -112,14 +122,14 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
 
   Widget _buildAlbumCard(BuildContext context, SpotifyAlbumEntity album) {
     return GestureDetector(
-      onTap: () => _launchSpotifyUrl(album.spotifyUrl),
+      onTap: () => _showAlbumPlayDialog(context, album),
       child: SizedBox(
         width: 160,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 160,
+              height: 140,
               width: 160,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
@@ -141,6 +151,18 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                           ? album.imageUrl
                           : 'https://via.placeholder.com/160',
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        );
+                      },
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.grey[300],
                         child: Icon(Icons.album, size: 60, color: Colors.grey),
@@ -158,14 +180,17 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                           ],
                         ),
                       ),
-                      child: const Align(
+                      child: Align(
                         alignment: Alignment.bottomRight,
                         child: Padding(
                           padding: EdgeInsets.all(12),
-                          child: Icon(
-                            Icons.play_circle_fill,
-                            color: AppColors.primary,
-                            size: 35,
+                          child: GestureDetector(
+                            onTap: () => _launchSpotifyUrl(album.spotifyUrl),
+                            child: Icon(
+                              Icons.play_circle_fill,
+                              color: AppColors.primary,
+                              size: 35,
+                            ),
                           ),
                         ),
                       ),
@@ -174,28 +199,114 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              album.name,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: context.isDarkMode ? Colors.white : Colors.black,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${album.totalTracks} tracks',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
+            const SizedBox(height: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    album.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: context.isDarkMode ? Colors.white : Colors.black,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  if (album.artists.isNotEmpty)
+                    Text(
+                      album.artists.first,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: context.isDarkMode
+                            ? Colors.white70
+                            : Colors.black54,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  const SizedBox(height: 1),
+                  Text(
+                    '${album.totalTracks} tracks',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showAlbumPlayDialog(BuildContext context, SpotifyAlbumEntity album) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(album.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                album.imageUrl,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 80,
+                  height: 80,
+                  color: Colors.grey[300],
+                  child: Icon(Icons.album, color: Colors.grey),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (album.artists.isNotEmpty)
+              Text(
+                'by ${album.artists.join(', ')}',
+                style: TextStyle(fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+            const SizedBox(height: 8),
+            Text(
+              '${album.totalTracks} tracks • ${album.releaseDate}',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _launchSpotifyUrl(album.spotifyUrl);
+            },
+            icon: Icon(Icons.open_in_new, color: Colors.white),
+            label: Text(
+              'Open in Spotify',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF1DB954), // Spotify green
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

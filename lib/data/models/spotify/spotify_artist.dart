@@ -54,6 +54,9 @@ class SpotifyTrackModel {
   final SpotifyAlbumModel album;
   final String? previewUrl;
   final String spotifyUrl;
+  final int durationMs;
+  final bool explicit;
+  final int popularity;
 
   SpotifyTrackModel({
     required this.id,
@@ -62,6 +65,9 @@ class SpotifyTrackModel {
     required this.album,
     this.previewUrl,
     required this.spotifyUrl,
+    required this.durationMs,
+    required this.explicit,
+    required this.popularity,
   });
 
   factory SpotifyTrackModel.fromJson(Map<String, dynamic> json) {
@@ -76,6 +82,29 @@ class SpotifyTrackModel {
       album: SpotifyAlbumModel.fromJson(json['album'] ?? {}),
       previewUrl: json['preview_url'],
       spotifyUrl: json['external_urls']?['spotify'] ?? '',
+      durationMs: json['duration_ms'] ?? 0,
+      explicit: json['explicit'] ?? false,
+      popularity: json['popularity'] ?? 0,
+    );
+  }
+}
+
+class SpotifyArtistSimpleModel {
+  final String id;
+  final String name;
+  final String spotifyUrl;
+
+  SpotifyArtistSimpleModel({
+    required this.id,
+    required this.name,
+    required this.spotifyUrl,
+  });
+
+  factory SpotifyArtistSimpleModel.fromJson(Map<String, dynamic> json) {
+    return SpotifyArtistSimpleModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      spotifyUrl: json['external_urls']?['spotify'] ?? '',
     );
   }
 }
@@ -88,6 +117,7 @@ class SpotifyAlbumModel {
   final String releaseDate;
   final int totalTracks;
   final String spotifyUrl;
+  final List<SpotifyArtistSimpleModel> artists;
 
   SpotifyAlbumModel({
     required this.id,
@@ -97,6 +127,7 @@ class SpotifyAlbumModel {
     required this.releaseDate,
     required this.totalTracks,
     required this.spotifyUrl,
+    required this.artists,
   });
 
   factory SpotifyAlbumModel.fromJson(Map<String, dynamic> json) {
@@ -112,6 +143,11 @@ class SpotifyAlbumModel {
       releaseDate: json['release_date'] ?? '',
       totalTracks: json['total_tracks'] ?? 0,
       spotifyUrl: json['external_urls']?['spotify'] ?? '',
+      artists:
+          (json['artists'] as List<dynamic>?)
+              ?.map((artist) => SpotifyArtistSimpleModel.fromJson(artist))
+              .toList() ??
+          [],
     );
   }
 }

@@ -301,11 +301,11 @@ class _SpotifyArtistDetailPageCleanState
               onPressed: () => context
                   .read<SpotifyArtistCubit>()
                   .getArtistTopTracks(widget.artist.id),
-              child: Text('Retry'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
+              child: Text('Retry'),
             ),
           ],
         ),

@@ -5,27 +5,31 @@ import 'package:sporify/service_locator.dart';
 
 class GetPopularAlbumsUseCase
     implements UseCase<List<SpotifyAlbumEntity>, void> {
+  final List<String> popularArtistIds = [
+    '6eUKZXaKkcviH0Ku9w2n3V', // Ed Sheeran
+    '0du5cEVh5yTK9QJze8zA0C', // Bruno Mars
+    '246dkjvS1zLTtiykXe5h60', // Post Malone
+    '66CXWjxzNUsdJxJ2JdwvnR', // Ariana Grande
+    '3TVXtAsR1Inumwj472S9r4', // Drake
+    '06HL4z0CvFAxyc27GXpf02', // Taylor Swift
+    '1uNFoZAHBGtllmzznpCI3s', // Justin Bieber
+    '4q3ewBCX7sLwd24euuV69X', // Bad Bunny
+    '0Y5tJX1MQlPlqiwlOH1tJY', // Travis Scott
+  ];
+
   @override
   Future<List<SpotifyAlbumEntity>> call({void params}) async {
-    // Lấy albums từ các artist phổ biến
-    const popularArtistIds = [
-      '66CXWjxzNUsdJxJ2JdwvnR', // Ariana Grande
-      '06HL4z0CvFAx86XM2NjONE', // Taylor Swift
-      '6eUKZXaKkcviH0Ku9w2n3V', // Ed Sheeran
-      '6qqNVTkY8uBg9cP3Jd7DAH', // Billie Eilish
-    ];
+    final List<SpotifyAlbumEntity> allAlbums = [];
 
-    List<SpotifyAlbumEntity> allAlbums = [];
+    // Lấy albums từ một số artists phổ biến
+    final random = popularArtistIds..shuffle();
+    final selectedArtists = random.take(5).toList(); // Lấy ngẫu nhiên 3 artists
 
-    for (String artistId in popularArtistIds) {
-      try {
-        final albums = await sl<SpotifyRepository>().getArtistAlbums(artistId);
-        allAlbums.addAll(albums.take(2)); // Lấy 2 album từ mỗi artist
-      } catch (e) {
-        print('Error getting albums for $artistId: $e');
-      }
+    for (final artistId in selectedArtists) {
+      final albums = await sl<SpotifyRepository>().getArtistAlbums(artistId);
+      allAlbums.addAll(albums);
     }
 
-    return allAlbums.take(8).toList(); // Trả về tối đa 8 albums
+    return allAlbums;
   }
 }

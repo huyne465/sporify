@@ -17,8 +17,7 @@ class GetPopularTracksUseCase
     implements UseCase<List<SpotifyTrackEntity>, void> {
   @override
   Future<List<SpotifyTrackEntity>> call({void params}) async {
-    // Sử dụng một artist ID mặc định hoặc playlist để lấy popular tracks
-    // Ví dụ: Ariana Grande's top tracks
-    return sl<SpotifyRepository>().getArtistTopTracks('66CXWjxzNUsdJxJ2JdwvnR');
+    // Sử dụng Travis Scott's artist ID - artist có nhiều track phổ biến
+    return sl<SpotifyRepository>().getArtistTopTracks('0Y5tJX1MQlPlqiwlOH1tJY');
   }
 }

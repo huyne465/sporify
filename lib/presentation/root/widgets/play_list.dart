@@ -9,6 +9,8 @@ import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit
 import 'package:sporify/presentation/root/bloc/play_list_cubit.dart';
 import 'package:sporify/presentation/root/bloc/play_list_state.dart';
 import 'package:sporify/presentation/song_player/pages/song_player.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sporify/core/configs/cache/cache_config.dart';
 
 class PlayList extends StatelessWidget {
   const PlayList({super.key});
@@ -136,19 +138,27 @@ class PlayList extends StatelessWidget {
                       child: SizedBox(
                         width: 60,
                         height: 60,
-                        child: Image.network(
-                          imageUrl,
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          cacheManager: ImageCacheConfig.imageCacheManager,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Icon(
-                                Icons.music_note,
-                                size: 30,
-                                color: Colors.grey,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                                strokeWidth: 2,
                               ),
-                            );
-                          },
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.music_note,
+                              size: 30,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ),
                       ),
                     ),

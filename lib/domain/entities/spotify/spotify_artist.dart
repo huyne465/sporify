@@ -24,6 +24,9 @@ class SpotifyTrackEntity {
   final String albumImageUrl;
   final String? previewUrl;
   final String spotifyUrl;
+  final int durationMs;
+  final bool explicit;
+  final int popularity;
 
   SpotifyTrackEntity({
     required this.id,
@@ -33,6 +36,9 @@ class SpotifyTrackEntity {
     required this.albumImageUrl,
     this.previewUrl,
     required this.spotifyUrl,
+    required this.durationMs,
+    required this.explicit,
+    required this.popularity,
   });
 }
 
@@ -44,6 +50,7 @@ class SpotifyAlbumEntity {
   final String releaseDate;
   final int totalTracks;
   final String spotifyUrl;
+  final List<String> artists;
 
   SpotifyAlbumEntity({
     required this.id,
@@ -53,5 +60,6 @@ class SpotifyAlbumEntity {
     required this.releaseDate,
     required this.totalTracks,
     required this.spotifyUrl,
+    required this.artists,
   });
 }

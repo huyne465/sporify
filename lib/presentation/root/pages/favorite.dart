@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
@@ -10,11 +11,13 @@ import 'package:sporify/data/repositories/playlist_repository.dart';
 import 'package:sporify/presentation/favorite/bloc/favorite_songs_cubit.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
 import 'package:sporify/presentation/playlist/widgets/create_playlist_dialog.dart';
+import 'package:sporify/presentation/playlist/widgets/playlist_options_dialog.dart';
 import 'package:sporify/presentation/playlist/pages/playlist_detail.dart';
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/song_player/pages/song_player.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:sporify/core/configs/cache/cache_config.dart';
 
 class FavoritePage extends StatefulWidget {
   const FavoritePage({super.key});
@@ -437,11 +440,41 @@ class _FavoritePageState extends State<FavoritePage>
         leading: Container(
           width: 50,
           height: 50,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(Icons.queue_music, color: AppColors.primary, size: 28),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+          child: playlist.coverImageUrl.isNotEmpty
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: playlist.coverImageUrl,
+                    cacheManager: ImageCacheConfig.imageCacheManager,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: AppColors.primary.withOpacity(0.2),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: AppColors.primary.withOpacity(0.2),
+                      child: Icon(
+                        Icons.queue_music,
+                        color: AppColors.primary,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                )
+              : Container(
+                  color: AppColors.primary.withOpacity(0.2),
+                  child: Icon(
+                    Icons.queue_music,
+                    color: AppColors.primary,
+                    size: 28,
+                  ),
+                ),
         ),
         title: Text(
           playlist.name,
@@ -477,18 +510,18 @@ class _FavoritePageState extends State<FavoritePage>
         ),
         trailing: PopupMenuButton<String>(
           onSelected: (value) {
-            if (value == 'delete') {
-              _deletePlaylist(context, playlist.id, playlist.name);
+            if (value == 'options') {
+              _showPlaylistOptions(context, playlist);
             }
           },
           itemBuilder: (context) => [
             const PopupMenuItem(
-              value: 'delete',
+              value: 'options',
               child: Row(
                 children: [
-                  Icon(Icons.delete, color: Colors.red),
+                  Icon(Icons.more_horiz, color: Colors.blue),
                   SizedBox(width: 8),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  Text('Options'),
                 ],
               ),
             ),
@@ -510,10 +543,28 @@ class _FavoritePageState extends State<FavoritePage>
     showDialog(
       context: context,
       builder: (dialogContext) => CreatePlaylistDialog(
-        onCreatePlaylist: (name, description) async {
+        onCreatePlaylist: (name, description, {String? coverImageUrl}) async {
           final cubit = context.read<PlaylistCubit>();
-          await cubit.createPlaylist(name: name, description: description);
+          await cubit.createPlaylist(
+            name: name,
+            description: description,
+            coverImageUrl: coverImageUrl ?? '',
+          );
         },
+      ),
+    );
+  }
+
+  void _showPlaylistOptions(BuildContext context, playlist) {
+    showDialog(
+      context: context,
+      builder: (context) => PlaylistOptionsDialog(
+        playlist: playlist,
+        onUpdate: () {
+          // Refresh playlists
+          context.read<PlaylistCubit>().listenToPlaylists();
+        },
+        onDelete: () => _deletePlaylist(context, playlist.id, playlist.name),
       ),
     );
   }

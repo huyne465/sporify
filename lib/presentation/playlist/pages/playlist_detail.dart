@@ -13,6 +13,9 @@ import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_songs_cubit.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_songs_state.dart';
 import 'package:sporify/presentation/song_player/pages/song_player.dart';
+import 'package:sporify/presentation/playlist/widgets/playlist_options_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sporify/core/configs/cache/cache_config.dart';
 
 class PlaylistDetailPage extends StatefulWidget {
   final PlaylistModel playlist;
@@ -39,21 +42,18 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
           title: Text('Playlist', style: TextStyle(fontSize: 18)),
           action: PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'delete') {
-                _showDeletePlaylistDialog();
+              if (value == 'options') {
+                _showPlaylistOptions();
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'delete',
+              const PopupMenuItem(
+                value: 'options',
                 child: Row(
                   children: [
-                    Icon(Icons.delete, color: Colors.red, size: 20),
+                    Icon(Icons.more_horiz, color: Colors.blue),
                     SizedBox(width: 8),
-                    Text(
-                      'Delete Playlist',
-                      style: TextStyle(color: Colors.red),
-                    ),
+                    Text('Options'),
                   ],
                 ),
               ),
@@ -82,7 +82,6 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
             width: 200,
             height: 200,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -95,19 +94,36 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
             child: widget.playlist.coverImageUrl.isNotEmpty
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      widget.playlist.coverImageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.playlist.coverImageUrl,
+                      cacheManager: ImageCacheConfig.imageCacheManager,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
+                      placeholder: (context, url) => Container(
+                        color: AppColors.primary.withOpacity(0.2),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: AppColors.primary.withOpacity(0.2),
+                        child: Icon(
                           Icons.queue_music,
                           size: 80,
                           color: AppColors.primary,
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   )
-                : Icon(Icons.queue_music, size: 80, color: AppColors.primary),
+                : Container(
+                    color: AppColors.primary.withOpacity(0.2),
+                    child: Icon(
+                      Icons.queue_music,
+                      size: 80,
+                      color: AppColors.primary,
+                    ),
+                  ),
           ),
           const SizedBox(height: 20),
           Text(
@@ -497,6 +513,20 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
             child: Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showPlaylistOptions() {
+    showDialog(
+      context: context,
+      builder: (context) => PlaylistOptionsDialog(
+        playlist: widget.playlist,
+        onUpdate: () {
+          // Refresh current page data if needed
+          setState(() {});
+        },
+        onDelete: () => _showDeletePlaylistDialog(),
       ),
     );
   }

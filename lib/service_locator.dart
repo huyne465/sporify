@@ -9,6 +9,7 @@ import 'package:sporify/data/sources/auth/auth_firebase_service.dart';
 import 'package:sporify/data/sources/song/song_firebase_service.dart';
 import 'package:sporify/data/sources/lyrics/lyrics_api_service.dart';
 import 'package:sporify/data/sources/spotify/spotify_api_service.dart';
+import 'package:sporify/data/sources/spotify/spotify_player_service.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
 import 'package:sporify/domain/repository/song/song.dart';
 import 'package:sporify/domain/repository/lyrics/lyrics.dart';
@@ -27,8 +28,8 @@ import 'package:sporify/domain/usecases/song/search_songs.dart';
 import 'package:sporify/domain/usecases/spotify/search_spotify_artists.dart';
 import 'package:sporify/domain/usecases/spotify/get_artist_top_tracks.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_artists.dart';
-import 'package:sporify/domain/usecases/spotify/get_popular_albums.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_tracks.dart';
+import 'package:sporify/domain/usecases/spotify/get_popular_albums.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
@@ -38,6 +39,8 @@ import 'package:sporify/domain/usecases/auth/reset_password.dart';
 import 'package:sporify/data/repositories/playlist_repository.dart';
 import 'package:sporify/data/repositories/favorite_songs_repository.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
+import 'package:sporify/presentation/spotify/bloc/spotify_player_cubit.dart';
+import 'package:sporify/domain/usecases/spotify/get_track_with_preview.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
@@ -48,11 +51,10 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<SignInUseCase>(SignInUseCase());
   sl.registerSingleton<ChangePasswordUseCase>(ChangePasswordUseCase());
   sl.registerSingleton<ResetPasswordUseCase>(ResetPasswordUseCase());
-  // Use Cases
   sl.registerSingleton<SignInWithGoogleUseCase>(SignInWithGoogleUseCase());
-  sl.registerSingleton<SignInWithFacebookUseCase>(
-    SignInWithFacebookUseCase(),
-  ); //repositories
+  sl.registerSingleton<SignInWithFacebookUseCase>(SignInWithFacebookUseCase());
+
+  //repositories
   sl.registerSingleton<PlaylistRepository>(PlaylistRepository());
   sl.registerSingleton<FavoriteSongsRepository>(FavoriteSongsRepository());
 
@@ -66,7 +68,6 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<GetPlayListUseCase>(GetPlayListUseCase());
   sl.registerSingleton<GetSongsByArtistUseCase>(GetSongsByArtistUseCase());
   sl.registerSingleton<SearchSongsUseCase>(SearchSongsUseCase());
-  //add to add or remove favorite, is favorite
   sl.registerSingleton<AddOrRemoveSongUseCase>(AddOrRemoveSongUseCase());
   sl.registerSingleton<IsFavoriteUseCase>(IsFavoriteUseCase());
 
@@ -86,9 +87,11 @@ Future<void> initializeDependencies() async {
 
   // Spotify services
   sl.registerSingleton<SpotifyApiService>(SpotifyApiServiceImpl());
+  sl.registerSingleton<SpotifyPlayerService>(SpotifyPlayerServiceImpl());
   sl.registerSingleton<SpotifyRepository>(
     SpotifyRepositoryImpl(spotifyApiService: sl<SpotifyApiService>()),
   );
+
   // Spotify use cases
   sl.registerSingleton<SearchSpotifyArtistsUseCase>(
     SearchSpotifyArtistsUseCase(),
@@ -96,9 +99,14 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<GetSpotifyArtistTopTracksUseCase>(
     GetSpotifyArtistTopTracksUseCase(),
   );
-  sl.registerSingleton<GetPopularArtistsUseCase>(GetPopularArtistsUseCase());
   sl.registerSingleton<GetPopularTracksUseCase>(GetPopularTracksUseCase());
   sl.registerSingleton<GetArtistTopTracksUseCase>(GetArtistTopTracksUseCase());
-  // Nếu có GetPopularAlbumsUseCase:
-  // sl.registerSingleton<GetPopularAlbumsUseCase>(GetPopularAlbumsUseCase());
+  sl.registerSingleton<GetPopularArtistsUseCase>(GetPopularArtistsUseCase());
+  sl.registerSingleton<GetPopularAlbumsUseCase>(GetPopularAlbumsUseCase());
+  sl.registerSingleton<GetTrackWithPreviewUseCase>(
+    GetTrackWithPreviewUseCase(),
+  );
+
+  // Spotify Player (preview only)
+  sl.registerLazySingleton(() => SpotifyPlayerCubit());
 }

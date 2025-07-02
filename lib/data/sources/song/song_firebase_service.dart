@@ -189,7 +189,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
       var titleQuery = await FirebaseFirestore.instance
           .collection('Songs')
           .where('title', isGreaterThanOrEqualTo: queryLower)
-          .where('title', isLessThan: queryLower + 'z')
+          .where('title', isLessThan: '${queryLower}z')
           .limit(20)
           .get();
 
@@ -197,7 +197,7 @@ class SongFirebaseServiceImpl extends SongFirebaseService {
       var artistQuery = await FirebaseFirestore.instance
           .collection('Songs')
           .where('artist', isGreaterThanOrEqualTo: queryLower)
-          .where('artist', isLessThan: queryLower + 'z')
+          .where('artist', isLessThan: '${queryLower}z')
           .limit(20)
           .get();
 

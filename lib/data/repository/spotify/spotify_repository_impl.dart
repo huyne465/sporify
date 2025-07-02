@@ -41,6 +41,9 @@ class SpotifyRepositoryImpl extends SpotifyRepository {
                 : '',
             previewUrl: model.previewUrl,
             spotifyUrl: model.spotifyUrl,
+            durationMs: model.durationMs,
+            explicit: model.explicit,
+            popularity: model.popularity,
           ),
         )
         .toList();
@@ -66,8 +69,51 @@ class SpotifyRepositoryImpl extends SpotifyRepository {
             releaseDate: model.releaseDate,
             totalTracks: model.totalTracks,
             spotifyUrl: model.spotifyUrl,
+            artists: model.artists.map((artist) => artist.name).toList(),
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<List<SpotifyAlbumEntity>> getSeveralAlbums(String albumIds) async {
+    final albumModels = await spotifyApiService.getSeveralAlbums(
+      albumIds.split(','),
+    );
+
+    return albumModels
+        .map(
+          (model) => SpotifyAlbumEntity(
+            id: model.id,
+            name: model.name,
+            imageUrl: model.images.isNotEmpty ? model.images.first.url : '',
+            albumType: model.albumType,
+            releaseDate: model.releaseDate,
+            totalTracks: model.totalTracks,
+            spotifyUrl: model.spotifyUrl,
+            artists: model.artists.map((artist) => artist.name).toList(),
+          ),
+        )
+        .toList();
+  }
+
+  @override
+  Future<SpotifyTrackEntity> getTrack(String trackId) async {
+    final trackModel = await spotifyApiService.getTrack(trackId);
+
+    return SpotifyTrackEntity(
+      id: trackModel.id,
+      name: trackModel.name,
+      artists: trackModel.artists,
+      albumName: trackModel.album.name,
+      albumImageUrl: trackModel.album.images.isNotEmpty
+          ? trackModel.album.images.first.url
+          : '',
+      previewUrl: trackModel.previewUrl,
+      spotifyUrl: trackModel.spotifyUrl,
+      durationMs: trackModel.durationMs,
+      explicit: trackModel.explicit,
+      popularity: trackModel.popularity,
+    );
   }
 }

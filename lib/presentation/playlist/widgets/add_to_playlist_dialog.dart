@@ -212,9 +212,13 @@ class AddToPlaylistDialog extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => CreatePlaylistDialog(
-        onCreatePlaylist: (name, description) async {
+        onCreatePlaylist: (name, description, {String? coverImageUrl}) async {
           final cubit = context.read<PlaylistCubit>();
-          await cubit.createPlaylist(name: name, description: description);
+          await cubit.createPlaylist(
+            name: name,
+            description: description,
+            coverImageUrl: coverImageUrl ?? '',
+          );
           Navigator.of(dialogContext).pop(); // Close the create dialog
         },
       ),

@@ -46,7 +46,7 @@ class SongService {
           .collection(_collection)
           .orderBy('title')
           .startAt([searchTerm.toLowerCase()])
-          .endAt([searchTerm.toLowerCase() + '\uf8ff'])
+          .endAt(['${searchTerm.toLowerCase()}\uf8ff'])
           .get();
 
       return querySnapshot.docs

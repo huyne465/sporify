@@ -127,10 +127,97 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
       throw Exception('Error getting artist albums: $e');
     }
   }
+
+  @override
+  Future<List<SpotifyAlbumModel>> getSeveralAlbums(
+    List<String> albumIds,
+  ) async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) throw Exception('Failed to get access token');
+
+      // Join album IDs with comma, max 20 albums per request
+      final ids = albumIds.take(20).join(',');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/albums?ids=${Uri.encodeComponent(ids)}'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final albums = data['albums'] as List<dynamic>;
+        return albums
+            .where((album) => album != null) // Filter out null albums
+            .map((album) => SpotifyAlbumModel.fromJson(album))
+            .toList();
+      } else {
+        throw Exception('Failed to get several albums: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting several albums: $e');
+    }
+  }
+
+  @override
+  Future<SpotifyTrackModel> getTrack(String trackId) async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) throw Exception('Failed to get access token');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/tracks/$trackId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return SpotifyTrackModel.fromJson(data);
+      } else {
+        throw Exception('Failed to get track: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting track: $e');
+    }
+  }
+
+  @override
+  Future<List<SpotifyTrackModel>> getSeveralTracks(
+    List<String> trackIds,
+  ) async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) throw Exception('Failed to get access token');
+
+      // Join track IDs with comma, max 50 tracks per request
+      final ids = trackIds.take(50).join(',');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/tracks?ids=${Uri.encodeComponent(ids)}'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final tracks = data['tracks'] as List<dynamic>;
+        return tracks
+            .where((track) => track != null) // Filter out null tracks
+            .map((track) => SpotifyTrackModel.fromJson(track))
+            .toList();
+      } else {
+        throw Exception('Failed to get several tracks: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting several tracks: $e');
+    }
+  }
 }
 
 abstract class SpotifyApiService {
   Future<List<SpotifyArtistModel>> searchArtists(String query);
   Future<List<SpotifyTrackModel>> getArtistTopTracks(String artistId);
   Future<List<SpotifyAlbumModel>> getArtistAlbums(String artistId);
+  Future<List<SpotifyAlbumModel>> getSeveralAlbums(List<String> albumIds);
+  Future<SpotifyTrackModel> getTrack(String trackId);
+  Future<List<SpotifyTrackModel>> getSeveralTracks(List<String> trackIds);
 }

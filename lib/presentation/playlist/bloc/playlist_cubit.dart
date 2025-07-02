@@ -81,4 +81,32 @@ class PlaylistCubit extends Cubit<PlaylistState> {
       emit(PlaylistError(e.toString()));
     }
   }
+
+  Future<void> updatePlaylist({
+    required String playlistId,
+    String? name,
+    String? description,
+    String? coverImageUrl,
+  }) async {
+    try {
+      await _repository.updatePlaylist(
+        playlistId: playlistId,
+        name: name,
+        description: description,
+        coverImageUrl: coverImageUrl,
+      );
+      // Stream will automatically update the UI
+    } catch (e) {
+      emit(PlaylistError(e.toString()));
+    }
+  }
+
+  Future<String> generateShareLink(String playlistId) async {
+    try {
+      return await _repository.generateShareableLink(playlistId);
+    } catch (e) {
+      emit(PlaylistError(e.toString()));
+      rethrow;
+    }
+  }
 }

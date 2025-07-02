@@ -141,10 +141,7 @@ class ArtistDetailPage extends StatelessWidget {
             children: [
               _buildStatItem("Songs", "${artist.songs}"),
               _buildStatItem("Albums", "${artist.albums}"),
-              _buildStatItem(
-                "Followers",
-                "${_formatFollowers(artist.followers)}",
-              ),
+              _buildStatItem("Followers", _formatFollowers(artist.followers)),
             ],
           ),
         ],

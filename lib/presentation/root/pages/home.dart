@@ -55,6 +55,8 @@ class _HomePageState extends State<HomePage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _homeTopArtistCard(),
+
+                    // Discover New Music Section
                     Padding(
                       padding: const EdgeInsets.only(left: 20, top: 10),
                       child: Text(
@@ -68,125 +70,49 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                     ),
+
                     _tabs(),
                     SizedBox(
-                      height: 270, // Adjusted height
+                      height: 270,
                       child: TabBarView(
                         physics: const BouncingScrollPhysics(),
                         controller: _tabController,
                         children: [
                           const NewsSongs(),
-                          Container(child: Center(child: Text("Coming soon"))),
-                          const ArtistList(), // Add artist list here
-                          Container(child: Center(child: Text("Coming soon"))),
-                        ],
-                      ),
-                    ),
-                    // Add Spotify Popular Artists section
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 20,
-                        top: 20,
-                        bottom: 15,
-                      ),
-                      child: Text(
-                        "Popular Artists on Spotify",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                          color: context.isDarkMode
-                              ? Colors.white
-                              : Colors.black87,
-                        ),
-                      ),
-                    ),
-                    const SpotifyArtistList(), // ✅ Đã gọi
-                    // Add Top Tracks section
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 20,
-                        top: 20,
-                        bottom: 15,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Top Tracks",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: context.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black87,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('All tracks page coming soon'),
-                                  backgroundColor: AppColors.primary,
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'See All',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                          Center(child: _buildComingSoonCard("Video content")),
+                          const ArtistList(),
+                          Center(
+                            child: _buildComingSoonCard("Podcast content"),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 300,
-                      child: const SpotifyPopularTracks(),
-                    ), // ✅ Đã gọi và hoạt động
-                    // Add Popular Albums section
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 20,
-                        top: 20,
-                        bottom: 15,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Popular Albums",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: context.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black87,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('All albums page coming soon'),
-                                  backgroundColor: AppColors.primary,
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'See All',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+
+                    // Spotify Popular Artists section
+                    _buildSectionHeader(
+                      "Popular Artists on Spotify",
+                      onSeeAll: () =>
+                          _showComingSoonSnackBar("All artists page"),
                     ),
-                    const SpotifyAlbumsList(), // ✅ Đã gọi nhưng chưa có data
-                    // Add Local Artists section
+                    const SpotifyArtistList(),
+
+                    // Top Tracks section
+                    _buildSectionHeader(
+                      "Top Tracks",
+                      onSeeAll: () =>
+                          _showComingSoonSnackBar("All tracks page"),
+                    ),
+                    SizedBox(height: 300, child: const SpotifyPopularTracks()),
+
+                    // Popular Albums section
+                    _buildSectionHeader(
+                      "Popular Albums",
+                      onSeeAll: () =>
+                          _showComingSoonSnackBar("All albums page"),
+                    ),
+                    SizedBox(height: 220, child: const SpotifyAlbumsList()),
+
+                    // Local Artists section
                     Padding(
                       padding: const EdgeInsets.only(
                         left: 20,
@@ -206,48 +132,16 @@ class _HomePageState extends State<HomePage>
                     ),
                     const ArtistList(),
 
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 10,
-                        top: 20,
-                        bottom: 15,
-                        right: 20,
-                      ),
-
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Top Playlists',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: context.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black87,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Text(
-                              'See More',
-                              style: TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                color: context.isDarkMode
-                                    ? Color(0xffC6C6C6)
-                                    : Color(0xff131313),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
+                    // Top Playlists section
+                    _buildSectionHeader(
+                      'Top Playlists',
+                      onSeeAll: () => _showComingSoonSnackBar("More playlists"),
                     ),
                     const PlayList(),
+
                     const SizedBox(height: 20),
 
-                    // Add placeholder for more content
+                    // Future content placeholder
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 20),
                       height: 100,
@@ -270,8 +164,9 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 20),
-                    const SizedBox(height: 80), // Add space for mini player
+                    const SizedBox(height: 80), // Space for mini player
                   ],
                 ),
               ),
@@ -280,6 +175,97 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       bottomNavigationBar: const MiniPlayer(),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, {VoidCallback? onSeeAll}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, top: 20, bottom: 15, right: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: context.isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ),
+          if (onSeeAll != null)
+            TextButton(
+              onPressed: onSeeAll,
+              child: Text(
+                'See All',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComingSoonCard(String content) {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        color: context.isDarkMode ? Colors.grey[800] : Colors.grey[100],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.hourglass_empty, size: 48, color: AppColors.primary),
+          const SizedBox(height: 16),
+          Text(
+            "$content coming soon",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: context.isDarkMode ? Colors.white : Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Stay tuned for updates!",
+            style: TextStyle(
+              fontSize: 14,
+              color: context.isDarkMode ? Colors.white70 : Colors.black54,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showComingSoonSnackBar(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Text(
+              '$feature coming soon',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
     );
   }
 

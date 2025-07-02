@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:ui';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_state.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:social_sharing_plus/social_sharing_plus.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
 import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
@@ -357,9 +359,7 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.share, color: Colors.grey[600]),
-                    onPressed: () {
-                      // Share functionality
-                    },
+                    onPressed: () => _showShareSongDialog(context),
                   ),
                 ],
               ),
@@ -403,5 +403,209 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     return "$minutes:$seconds";
+  }
+
+  void _showShareSongDialog(BuildContext context) {
+    final currentSong =
+        context.read<GlobalMusicPlayerCubit>().state.currentSong ??
+        widget.songEntity;
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Share Song',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${currentSong.title} by ${currentSong.artist}',
+              style: TextStyle(color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+
+            // Share options
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildShareOption(
+                  context,
+                  icon: Icons.facebook,
+                  label: 'Facebook',
+                  color: Colors.blue,
+                  onTap: () => _shareSongToFacebook(context, currentSong),
+                ),
+                _buildShareOption(
+                  context,
+                  icon: Icons.message,
+                  label: 'WhatsApp',
+                  color: Colors.green,
+                  onTap: () => _shareSongToWhatsApp(context, currentSong),
+                ),
+                _buildShareOption(
+                  context,
+                  icon: Icons.telegram,
+                  label: 'Telegram',
+                  color: Colors.cyan,
+                  onTap: () => _shareSongToTelegram(context, currentSong),
+                ),
+                _buildShareOption(
+                  context,
+                  icon: Icons.more_horiz,
+                  label: 'More',
+                  color: Colors.grey,
+                  onTap: () => _shareSongGeneric(context, currentSong),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShareOption(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: color),
+            ),
+            child: Icon(icon, color: color, size: 30),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: TextStyle(fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _shareSongToFacebook(
+    BuildContext context,
+    SongEntity song,
+  ) async {
+    try {
+      Navigator.pop(context);
+
+      final content =
+          '🎵 Currently listening to "${song.title}" by ${song.artist} on Sporify!';
+
+      await SocialSharingPlus.shareToSocialMedia(
+        SocialPlatform.facebook,
+        content,
+        isOpenBrowser: true,
+        onAppNotInstalled: () {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('Facebook is not installed.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          _shareSongGeneric(context, song);
+        },
+      );
+    } catch (e) {
+      await _shareSongGeneric(context, song);
+    }
+  }
+
+  Future<void> _shareSongToWhatsApp(
+    BuildContext context,
+    SongEntity song,
+  ) async {
+    try {
+      Navigator.pop(context);
+
+      final content =
+          '🎵 Check out this song: "${song.title}" by ${song.artist} 🎶';
+
+      await SocialSharingPlus.shareToSocialMedia(
+        SocialPlatform.whatsapp,
+        content,
+        isOpenBrowser: false,
+        onAppNotInstalled: () {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('WhatsApp is not installed.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          _shareSongGeneric(context, song);
+        },
+      );
+    } catch (e) {
+      await _shareSongGeneric(context, song);
+    }
+  }
+
+  Future<void> _shareSongToTelegram(
+    BuildContext context,
+    SongEntity song,
+  ) async {
+    try {
+      Navigator.pop(context);
+
+      final content = '🎵 "${song.title}" by ${song.artist} - Great song! 🎶';
+
+      await SocialSharingPlus.shareToSocialMedia(
+        SocialPlatform.telegram,
+        content,
+        isOpenBrowser: false,
+        onAppNotInstalled: () {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text('Telegram is not installed.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          _shareSongGeneric(context, song);
+        },
+      );
+    } catch (e) {
+      await _shareSongGeneric(context, song);
+    }
+  }
+
+  Future<void> _shareSongGeneric(BuildContext context, SongEntity song) async {
+    try {
+      await Share.share(
+        '🎵 Check out this song: "${song.title}" by ${song.artist} on Sporify!',
+        subject: 'Great song recommendation',
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to share song'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

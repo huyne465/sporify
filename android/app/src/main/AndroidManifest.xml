@@ -56,6 +56,17 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <!-- File Provider for sharing media -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
     </application>
     
     <!-- Required to query activities that can process text, see:
@@ -76,5 +87,19 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="http" />
         </intent>
+        <!-- Query for Facebook -->
+        <package android:name="com.facebook.katana" />
+        <!-- Query for Twitter -->
+        <package android:name="com.twitter.android" />
+        <!-- Query for LinkedIn -->
+        <package android:name="com.linkedin.android" />
+        <!-- Query for Reddit -->
+        <package android:name="com.reddit.frontpage" />
+        <!-- Query for WhatsApp -->
+        <package android:name="com.whatsapp" />
+        <!-- Query for Telegram -->
+        <package android:name="org.telegram.messenger" />
+        <!-- Query for Instagram -->
+        <package android:name="com.instagram.android" />
     </queries>
 </manifest>

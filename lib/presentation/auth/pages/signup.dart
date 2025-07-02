@@ -17,7 +17,7 @@ import 'package:sporify/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignupPage extends StatefulWidget {
-  SignupPage({super.key});
+  const SignupPage({super.key});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
