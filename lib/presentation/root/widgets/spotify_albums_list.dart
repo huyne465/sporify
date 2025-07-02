@@ -33,10 +33,6 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
 
       print('🎵 Loading albums...');
 
-<<<<<<< HEAD
-=======
-      // Kiểm tra xem UseCase đã được đăng ký chưa
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
       if (!sl.isRegistered<GetPopularAlbumsUseCase>()) {
         throw Exception(
           'GetPopularAlbumsUseCase chưa được đăng ký trong service locator',
@@ -132,13 +128,8 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Giảm height của image container
             Container(
-<<<<<<< HEAD
               height: 140,
-=======
-              height: 140, // Giảm từ 160 xuống 140
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
               width: 160,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
@@ -208,12 +199,7 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                 ),
               ),
             ),
-<<<<<<< HEAD
             const SizedBox(height: 8),
-=======
-            const SizedBox(height: 8), // Giảm từ 10 xuống 8
-            // Wrap text trong Expanded để tránh overflow
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,31 +208,18 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                     album.name,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-<<<<<<< HEAD
                       fontSize: 13,
-=======
-                      fontSize: 13, // Giảm font size từ 14 xuống 13
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
                       color: context.isDarkMode ? Colors.white : Colors.black,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-<<<<<<< HEAD
                   const SizedBox(height: 2),
-=======
-                  const SizedBox(height: 2), // Giảm từ 4 xuống 2
-                  // Hiển thị artist name nếu có
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
                   if (album.artists.isNotEmpty)
                     Text(
                       album.artists.first,
                       style: TextStyle(
-<<<<<<< HEAD
                         fontSize: 11,
-=======
-                        fontSize: 11, // Giảm từ 12 xuống 11
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
                         color: context.isDarkMode
                             ? Colors.white70
                             : Colors.black54,
@@ -254,19 +227,11 @@ class _SpotifyAlbumsListState extends State<SpotifyAlbumsList> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-<<<<<<< HEAD
                   const SizedBox(height: 1),
                   Text(
                     '${album.totalTracks} tracks',
                     style: TextStyle(
                       fontSize: 10,
-=======
-                  const SizedBox(height: 1), // Giảm từ 2 xuống 1
-                  Text(
-                    '${album.totalTracks} tracks',
-                    style: TextStyle(
-                      fontSize: 10, // Giảm từ 11 xuống 10
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
                       color: AppColors.primary,
                       fontWeight: FontWeight.w500,
                     ),

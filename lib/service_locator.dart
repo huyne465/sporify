@@ -101,7 +101,6 @@ Future<void> initializeDependencies() async {
   );
   sl.registerSingleton<GetPopularTracksUseCase>(GetPopularTracksUseCase());
   sl.registerSingleton<GetArtistTopTracksUseCase>(GetArtistTopTracksUseCase());
-<<<<<<< HEAD
   sl.registerSingleton<GetPopularArtistsUseCase>(GetPopularArtistsUseCase());
   sl.registerSingleton<GetPopularAlbumsUseCase>(GetPopularAlbumsUseCase());
   sl.registerSingleton<GetTrackWithPreviewUseCase>(
@@ -110,7 +109,4 @@ Future<void> initializeDependencies() async {
 
   // Spotify Player (preview only)
   sl.registerLazySingleton(() => SpotifyPlayerCubit());
-=======
-  sl.registerSingleton<GetPopularAlbumsUseCase>(GetPopularAlbumsUseCase());
->>>>>>> e0468694e348c49ecdc8bc81ba94b8f169e06cf2
 }
