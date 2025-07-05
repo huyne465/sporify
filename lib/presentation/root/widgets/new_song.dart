@@ -101,44 +101,14 @@ class NewsSongs extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
-            // Load song in global music player
-            context.read<GlobalMusicPlayerCubit>().loadSong(
-              songs[index],
-              songList: songs,
-            );
+            // Load song in random mode (no playlist)
+            context.read<GlobalMusicPlayerCubit>().loadSong(songs[index]);
 
-            // Navigate to song player
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) =>
                     SongPlayerPage(songEntity: songs[index]),
-              ),
-            );
-
-            // Show feedback
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    Icon(Icons.music_note, color: Colors.white, size: 20),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Playing ${songs[index].title}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                backgroundColor: AppColors.primary,
-                duration: const Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                margin: const EdgeInsets.all(16),
               ),
             );
           },

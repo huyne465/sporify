@@ -13,6 +13,8 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
   List<SongEntity> allSongs = [];
   int currentSongIndex = 0;
   bool isPlaylistMode = false;
+  String currentPlaylistName = '';
+
   GlobalMusicPlayerCubit() : super(GlobalMusicPlayerState()) {
     // Listen to player state changes
     audioPlayer.playerStateStream.listen((playerState) {
@@ -48,9 +50,12 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
     }
   }
 
-  Future<void> loadSong(SongEntity song, {List<SongEntity>? songList}) async {
+  Future<void> loadSong(
+    SongEntity song, {
+    List<SongEntity>? songList,
+    String? playlistName,
+  }) async {
     if (songList != null) {
-      // Playlist mode: play in order
       playlist = songList;
       currentSongIndex = playlist.indexWhere((s) => s.songId == song.songId);
       if (currentSongIndex == -1) {
@@ -58,25 +63,37 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
         currentSongIndex = 0;
       }
       isPlaylistMode = true;
+      currentPlaylistName = playlistName ?? 'Custom Playlist';
     } else {
-      // Random mode: create playlist with current song + shuffled other songs
       playlist = [song];
       currentSongIndex = 0;
       isPlaylistMode = false;
+      currentPlaylistName = '';
 
-      // Add other random songs to the playlist for continuous play
       if (allSongs.isNotEmpty) {
         final otherSongs = allSongs
             .where((s) => s.songId != song.songId)
             .toList();
         otherSongs.shuffle();
-        playlist.addAll(otherSongs);
+        playlist.addAll(otherSongs.take(50));
       }
     }
 
     emit(
       state.copyWith(currentSong: song, isLoading: true, playlist: playlist),
     );
+
+    try {
+      await audioPlayer.setUrl(song.songUrl);
+      songDuration = audioPlayer.duration ?? Duration.zero;
+      emit(state.copyWith(isLoading: false, duration: songDuration));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false));
+    }
+  }
+
+  Future<void> _loadSongAtIndex(SongEntity song) async {
+    emit(state.copyWith(currentSong: song, isLoading: true));
 
     try {
       await audioPlayer.setUrl(song.songUrl);
@@ -97,71 +114,145 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
   }
 
   void playNext() {
-    if (playlist.isNotEmpty && currentSongIndex < playlist.length - 1) {
-      currentSongIndex++;
+    if (playlist.isEmpty) return;
+
+    if (isPlaylistMode) {
+      // Playlist mode: play next song in order, loop if at end
+      if (currentSongIndex < playlist.length - 1) {
+        currentSongIndex++;
+      } else {
+        currentSongIndex = 0; // Loop back to first song
+      }
       final nextSong = playlist[currentSongIndex];
       _loadSongAtIndex(nextSong);
-    } else if (playlist.isNotEmpty && !isPlaylistMode) {
-      // For random mode, if we've reached the end, shuffle and continue
-      if (allSongs.isNotEmpty) {
-        final currentSong = playlist[currentSongIndex];
-        final otherSongs = allSongs
-            .where((s) => s.songId != currentSong.songId)
-            .toList();
-        otherSongs.shuffle();
-
-        playlist = [currentSong, ...otherSongs];
-        currentSongIndex = 1; // Move to first shuffled song
-
+    } else {
+      // Random mode: continue with shuffled songs
+      if (currentSongIndex < playlist.length - 1) {
+        currentSongIndex++;
         final nextSong = playlist[currentSongIndex];
         _loadSongAtIndex(nextSong);
+      } else {
+        // Generate new random playlist when reaching end
+        _generateNewRandomPlaylist();
       }
     }
   }
 
   void playPrevious() {
-    if (playlist.isNotEmpty && currentSongIndex > 0) {
-      currentSongIndex--;
+    if (playlist.isEmpty) return;
+
+    if (isPlaylistMode) {
+      // Playlist mode: play previous song in order
+      if (currentSongIndex > 0) {
+        currentSongIndex--;
+      } else {
+        currentSongIndex = playlist.length - 1; // Loop to last song
+      }
       final previousSong = playlist[currentSongIndex];
       _loadSongAtIndex(previousSong);
+    } else {
+      // Random mode: go to previous song if available
+      if (currentSongIndex > 0) {
+        currentSongIndex--;
+        final previousSong = playlist[currentSongIndex];
+        _loadSongAtIndex(previousSong);
+      }
     }
   }
 
-  Future<void> _loadSongAtIndex(SongEntity song) async {
-    emit(state.copyWith(currentSong: song, isLoading: true));
+  void _generateNewRandomPlaylist() {
+    if (allSongs.isEmpty) return;
 
-    try {
-      await audioPlayer.setUrl(song.songUrl);
-      songDuration = audioPlayer.duration ?? Duration.zero;
-      emit(state.copyWith(isLoading: false, duration: songDuration));
+    final currentSong = playlist[currentSongIndex];
+    final otherSongs = allSongs
+        .where((s) => s.songId != currentSong.songId)
+        .toList();
+    otherSongs.shuffle();
 
-      // Auto play the next song
-      audioPlayer.play();
-      emit(state.copyWith(isPlaying: true));
-    } catch (e) {
-      emit(state.copyWith(isLoading: false));
+    playlist = [currentSong, ...otherSongs.take(50)];
+    currentSongIndex = 1; // Move to first shuffled song
+
+    if (playlist.length > 1) {
+      final nextSong = playlist[currentSongIndex];
+      _loadSongAtIndex(nextSong);
     }
   }
 
-  void seekTo(Duration position) {
-    audioPlayer.seek(position);
+  void exitPlaylistMode() {
+    if (!isPlaylistMode) return;
+
+    final currentSong = state.currentSong;
+    if (currentSong == null) return;
+
+    // Switch to random mode
+    isPlaylistMode = false;
+    currentPlaylistName = '';
+
+    // Create new random playlist starting with current song
+    playlist = [currentSong];
+    currentSongIndex = 0;
+
+    if (allSongs.isNotEmpty) {
+      final otherSongs = allSongs
+          .where((s) => s.songId != currentSong.songId)
+          .toList();
+      otherSongs.shuffle();
+      playlist.addAll(otherSongs.take(50));
+    }
+
+    // Emit new state
+    emit(state.copyWith(playlist: playlist));
+  }
+
+  void shuffleCurrentPlaylist() {
+    if (playlist.isEmpty) return;
+
+    final currentSong = state.currentSong;
+    if (currentSong == null) return;
+
+    if (isPlaylistMode) {
+      // In playlist mode, shuffle the playlist but keep current song
+      final otherSongs = playlist
+          .where((s) => s.songId != currentSong.songId)
+          .toList();
+      otherSongs.shuffle();
+
+      playlist = [currentSong, ...otherSongs];
+      currentSongIndex = 0;
+    } else {
+      // In random mode, generate new random order
+      _generateNewRandomPlaylist();
+    }
+
+    emit(state.copyWith(playlist: playlist));
   }
 
   // Get current playlist info
   String get currentPlaylistInfo {
     if (playlist.isEmpty) return '';
     if (isPlaylistMode) {
-      return 'Playlist • ${playlist.length} songs';
+      return '$currentPlaylistName • ${playlist.length} songs';
     } else {
       return 'Random play • Endless queue';
     }
   }
 
   // Check if there are previous/next songs
-  bool get hasPrevious => playlist.isNotEmpty && currentSongIndex > 0;
-  bool get hasNext =>
-      playlist.isNotEmpty &&
-      (currentSongIndex < playlist.length - 1 || !isPlaylistMode);
+  bool get hasPrevious {
+    if (playlist.isEmpty) return false;
+    return isPlaylistMode || currentSongIndex > 0;
+  }
+
+  bool get hasNext {
+    if (playlist.isEmpty) return false;
+    return isPlaylistMode ||
+        currentSongIndex < playlist.length - 1 ||
+        allSongs.isNotEmpty;
+  }
+
+  void seekTo(Duration position) {
+    audioPlayer.seek(position);
+  }
 
   @override
   Future<void> close() {

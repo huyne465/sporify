@@ -379,6 +379,7 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
       context.read<GlobalMusicPlayerCubit>().loadSong(
         songs[0],
         songList: songs,
+        playlistName: widget.playlist.name,
       );
 
       Navigator.push(
@@ -416,7 +417,11 @@ class _PlaylistDetailPageState extends State<PlaylistDetailPage> {
   }
 
   void _playSong(SongEntity song, List<SongEntity> allSongs, int index) {
-    context.read<GlobalMusicPlayerCubit>().loadSong(song, songList: allSongs);
+    context.read<GlobalMusicPlayerCubit>().loadSong(
+      song,
+      songList: allSongs,
+      playlistName: widget.playlist.name,
+    );
 
     Navigator.push(
       context,

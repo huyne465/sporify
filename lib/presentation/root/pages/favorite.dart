@@ -315,114 +315,131 @@ class _FavoritePageState extends State<FavoritePage>
   Widget _buildSongTile(BuildContext context, SongEntity song) {
     final imageUrl = AppUrls.getImageUrl(song.artist, song.title, song.image);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.grey[900]
-            : Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            width: 50,
-            height: 50,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.music_note, color: Colors.grey),
-                );
-              },
+    return BlocBuilder<FavoriteSongsCubit, FavoriteSongsState>(
+      builder: (context, state) {
+        // Get songs list from state
+        List<SongEntity> songsList = [];
+        if (state is FavoriteSongsLoaded) {
+          songsList = state.songs;
+        }
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[900]
+                : Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 4,
             ),
-          ),
-        ),
-        title: Text(
-          song.title,
-          style: TextStyle(
-            color: context.isDarkMode ? Colors.white : Colors.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          song.artist,
-          style: TextStyle(
-            color: context.isDarkMode ? Colors.white70 : Colors.grey[600],
-            fontSize: 14,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FavoriteButton(songEntity: song, showPlaylistButton: true),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: Icon(
-                Icons.play_arrow,
-                color: context.isDarkMode ? Colors.white : Colors.black,
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.music_note, color: Colors.grey),
+                    );
+                  },
+                ),
               ),
-              onPressed: () {
-                // Load song in global music player
-                context.read<GlobalMusicPlayerCubit>().loadSong(song);
-
-                // Navigate to song player
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SongPlayerPage(songEntity: song),
+            ),
+            title: Text(
+              song.title,
+              style: TextStyle(
+                color: context.isDarkMode ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              song.artist,
+              style: TextStyle(
+                color: context.isDarkMode ? Colors.white70 : Colors.grey[600],
+                fontSize: 14,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FavoriteButton(songEntity: song, showPlaylistButton: true),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(
+                    Icons.play_arrow,
+                    color: context.isDarkMode ? Colors.white : Colors.black,
                   ),
-                );
+                  onPressed: () {
+                    context.read<GlobalMusicPlayerCubit>().loadSong(
+                      song,
+                      songList: songsList,
+                      playlistName: "Liked Songs",
+                    );
 
-                // Show feedback
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        Icon(Icons.music_note, color: Colors.white, size: 20),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Playing ${song.title}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SongPlayerPage(songEntity: song),
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(Icons.favorite, color: Colors.white, size: 20),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Playing from Liked Songs',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    backgroundColor: AppColors.primary,
-                    duration: const Duration(seconds: 2),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    margin: const EdgeInsets.all(16),
-                  ),
-                );
-              },
+                        backgroundColor: AppColors.primary,
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-        onTap: () {
-          // Load song and navigate on tile tap
-          context.read<GlobalMusicPlayerCubit>().loadSong(song);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SongPlayerPage(songEntity: song),
-            ),
-          );
-        },
-      ),
+            onTap: () {
+              context.read<GlobalMusicPlayerCubit>().loadSong(
+                song,
+                songList: songsList,
+                playlistName: "Liked Songs",
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SongPlayerPage(songEntity: song),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 

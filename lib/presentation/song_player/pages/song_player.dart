@@ -251,6 +251,7 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                       ? widget.songEntity.duration.toDouble()
                       : state.duration.inSeconds.toDouble(),
                   onChanged: (value) {
+                    final cubit = context.read<GlobalMusicPlayerCubit>();
                     cubit.seekTo(Duration(seconds: value.toInt()));
                   },
                 ),
@@ -338,6 +339,24 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                     icon: Icon(Icons.repeat, color: Colors.grey[600]),
                     onPressed: () {
                       // Repeat functionality
+                    },
+                  ),
+                  // Add exit playlist button
+                  BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+                    builder: (context, state) {
+                      final cubit = context.read<GlobalMusicPlayerCubit>();
+
+                      if (cubit.isPlaylistMode) {
+                        return IconButton(
+                          icon: Icon(
+                            Icons.playlist_remove,
+                            color: Colors.orange,
+                          ),
+                          onPressed: () => _showExitPlaylistDialog(context),
+                          tooltip: 'Exit Playlist Mode',
+                        );
+                      }
+                      return SizedBox.shrink();
                     },
                   ),
                   IconButton(
@@ -607,5 +626,75 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
         ),
       );
     }
+  }
+
+  void _showExitPlaylistDialog(BuildContext context) {
+    final cubit = context.read<GlobalMusicPlayerCubit>();
+    final playlistInfo = cubit.currentPlaylistInfo;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.playlist_remove, color: Colors.orange),
+            const SizedBox(width: 12),
+            Text('Exit Playlist Mode'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Currently playing from: $playlistInfo',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Exit playlist mode and switch to random play mode?',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your current song will continue playing.',
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              cubit.exitPlaylistMode();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.shuffle, color: Colors.white, size: 20),
+                      const SizedBox(width: 12),
+                      Text('Switched to random play mode'),
+                    ],
+                  ),
+                  backgroundColor: Colors.orange,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.all(16),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: Text('Exit Playlist', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 }

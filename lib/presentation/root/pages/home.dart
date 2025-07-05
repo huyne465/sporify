@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
@@ -18,6 +20,7 @@ import 'package:sporify/domain/repository/auth/auth.dart';
 import 'package:sporify/presentation/root/widgets/spotify_artist_list.dart';
 import 'package:sporify/presentation/root/widgets/spotify_albums_list.dart';
 import 'package:sporify/presentation/root/widgets/spotify_popular_tracks.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -174,7 +177,15 @@ class _HomePageState extends State<HomePage>
           ],
         ),
       ),
-      bottomNavigationBar: const MiniPlayer(),
+      bottomNavigationBar:
+          BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+            builder: (context, state) {
+              if (state.currentSong == null) {
+                return const SizedBox.shrink();
+              }
+              return const MiniPlayer();
+            },
+          ),
     );
   }
 

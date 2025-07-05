@@ -8,6 +8,8 @@ import 'package:sporify/core/configs/themes/app_theme.dart';
 import 'package:sporify/firebase_options.dart';
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
+import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
 import 'package:sporify/service_locator.dart';
 
@@ -89,6 +91,17 @@ class AppWithMiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SplashPage(); // Remove the scaffold wrapper, let splash handle navigation
+    return Scaffold(
+      body: const SplashPage(),
+      bottomNavigationBar:
+          BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+            builder: (context, state) {
+              if (state.currentSong == null) {
+                return const SizedBox.shrink();
+              }
+              return const MiniPlayer();
+            },
+          ),
+    );
   }
 }

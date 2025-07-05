@@ -32,15 +32,13 @@ class SongPlayerCubit extends HydratedCubit<SongPlayerState> {
     });
   }
 
-  Future<void> LoadSong(String? songUrl) async {
+  Future<void> loadSong(String? songUrl) async {
     if (songUrl == null || songUrl.isEmpty) {
       emit(SongPlayerFailure());
       return;
     }
 
-    // Check if we're loading the same song
     if (currentSongUrl == songUrl) {
-      // Resume from saved position
       if (songPosition > Duration.zero) {
         audioPlayer.seek(songPosition);
       }
@@ -48,7 +46,6 @@ class SongPlayerCubit extends HydratedCubit<SongPlayerState> {
       return;
     }
 
-    // If new song, load it
     currentSongUrl = songUrl;
     emit(SongPlayerLoading());
 
@@ -61,7 +58,7 @@ class SongPlayerCubit extends HydratedCubit<SongPlayerState> {
     }
   }
 
-  void PlayOrPauseSong() {
+  void playOrPauseSong() {
     if (audioPlayer.playing) {
       audioPlayer.pause();
     } else {

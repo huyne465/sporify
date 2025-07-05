@@ -62,7 +62,9 @@ class MiniPlayer extends StatelessWidget {
                     image: DecorationImage(
                       image: NetworkImage(imageUrl),
                       fit: BoxFit.cover,
-                      onError: (exception, stackTrace) {},
+                      onError: (exception, stackTrace) {
+                        // Handle error silently or show placeholder
+                      },
                     ),
                   ),
                   child: state.isLoading
@@ -72,7 +74,15 @@ class MiniPlayer extends StatelessWidget {
                             strokeWidth: 2,
                           ),
                         )
-                      : null,
+                      : Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: imageUrl.isEmpty ? Colors.grey[300] : null,
+                          ),
+                          child: imageUrl.isEmpty
+                              ? const Icon(Icons.music_note, color: Colors.grey)
+                              : null,
+                        ),
                 ),
               ),
 

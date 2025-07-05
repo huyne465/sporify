@@ -178,10 +178,11 @@ class PlayList extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     onTap: () {
-                      // Use global music player
+                      // Use global music player with playlist info
                       context.read<GlobalMusicPlayerCubit>().loadSong(
                         songs[index],
                         songList: songs,
+                        playlistName: "Featured Songs",
                       );
                     },
                   ),
@@ -207,10 +208,11 @@ class PlayList extends StatelessWidget {
                           : Color(0xff555555),
                     ),
                     onPressed: () {
-                      // Use global music player
+                      // Use global music player with playlist info
                       context.read<GlobalMusicPlayerCubit>().loadSong(
                         songs[index],
                         songList: songs,
+                        playlistName: "Featured Songs",
                       );
 
                       Navigator.push(
@@ -226,13 +228,13 @@ class PlayList extends StatelessWidget {
                           content: Row(
                             children: [
                               Icon(
-                                Icons.music_note,
+                                Icons.playlist_play,
                                 color: Colors.white,
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                'Playing ${songs[index].title}',
+                                'Playing from Featured Songs',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
