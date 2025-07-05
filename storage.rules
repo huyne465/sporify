@@ -1,0 +1,46 @@
+// Firebase Storage Security Rules
+// Thêm vào Firebase Console -> Storage -> Rules
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Rules for audio files
+    match /audio/{allPaths=**} {
+      // Allow read access for all authenticated users
+      allow read: if request.auth != null;
+      
+      // Allow write/delete only for admin users or specific users
+      allow write, delete: if request.auth != null 
+        && (request.auth.token.admin == true || request.auth.uid == 'YOUR_ADMIN_UID');
+    }
+    
+    // Rules for image files
+    match /images/{allPaths=**} {
+      // Allow read access for all authenticated users
+      allow read: if request.auth != null;
+      
+      // Allow write/delete only for admin users or specific users
+      allow write, delete: if request.auth != null 
+        && (request.auth.token.admin == true || request.auth.uid == 'YOUR_ADMIN_UID');
+    }
+    
+    // Default rule - deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+/* 
+Hướng dẫn cấu hình:
+1. Vào Firebase Console -> Storage -> Rules
+2. Thay thế rules hiện tại bằng code trên
+3. Thay 'YOUR_ADMIN_UID' bằng UID thực tế của admin user
+4. Hoặc để admin == true, cần set custom claims cho user trong Firebase Auth
+
+Để set custom claims cho admin user:
+- Vào Firebase Console -> Authentication -> Users
+- Chọn user cần set làm admin
+- Trong Admin SDK, chạy:
+  admin.auth().setCustomUserClaims(uid, {admin: true})
+*/

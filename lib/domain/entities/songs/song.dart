@@ -9,6 +9,12 @@ class SongEntity {
   final String songUrl;
   final bool isFavorite;
   final String songId;
+  final String? album;
+  final String? genre;
+  final String? platform;
+  final String? addedBy;
+  final Timestamp? addedAt;
+  final int? fileSize;
 
   SongEntity({
     required this.title,
@@ -19,5 +25,11 @@ class SongEntity {
     required this.songUrl,
     required this.isFavorite,
     required this.songId,
+    this.album,
+    this.genre,
+    this.platform,
+    this.addedBy,
+    this.addedAt,
+    this.fileSize,
   });
 }

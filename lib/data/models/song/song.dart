@@ -10,6 +10,12 @@ class SongModel {
   String? songUrl;
   bool? isFavorite;
   String? songId;
+  String? album;
+  String? genre;
+  String? platform;
+  String? addedBy;
+  Timestamp? addedAt;
+  int? fileSize;
 
   SongModel({
     required this.title,
@@ -20,6 +26,12 @@ class SongModel {
     required this.songUrl,
     required this.isFavorite,
     required this.songId,
+    this.album,
+    this.genre,
+    this.platform,
+    this.addedBy,
+    this.addedAt,
+    this.fileSize,
   });
 
   SongModel.fromJson(Map<String, dynamic> data) {
@@ -31,6 +43,12 @@ class SongModel {
     songUrl = data['songUrl'];
     isFavorite = data['isFavorite'];
     songId = data['songId'];
+    album = data['album'];
+    genre = data['genre'];
+    platform = data['platform'];
+    addedBy = data['addedBy'];
+    addedAt = data['addedAt'];
+    fileSize = data['fileSize'];
   }
 
   factory SongModel.fromFirestore(DocumentSnapshot doc) {
@@ -44,6 +62,12 @@ class SongModel {
       songUrl: data['songUrl'],
       isFavorite: data['isFavorite'] ?? false,
       songId: doc.id,
+      album: data['album'],
+      genre: data['genre'],
+      platform: data['platform'],
+      addedBy: data['addedBy'],
+      addedAt: data['addedAt'],
+      fileSize: data['fileSize'],
     );
   }
 
@@ -57,6 +81,12 @@ class SongModel {
       'songUrl': songUrl,
       'isFavorite': isFavorite,
       'songId': songId,
+      'album': album,
+      'genre': genre,
+      'platform': platform,
+      'addedBy': addedBy,
+      'addedAt': addedAt,
+      'fileSize': fileSize,
     };
   }
 }
@@ -72,6 +102,12 @@ extension SongModelx on SongModel {
       songUrl: songUrl!,
       isFavorite: isFavorite!,
       songId: songId!,
+      album: album,
+      genre: genre,
+      platform: platform,
+      addedBy: addedBy,
+      addedAt: addedAt,
+      fileSize: fileSize,
     );
   }
 }

@@ -21,6 +21,9 @@ import 'package:sporify/presentation/root/widgets/spotify_artist_list.dart';
 import 'package:sporify/presentation/root/widgets/spotify_albums_list.dart';
 import 'package:sporify/presentation/root/widgets/spotify_popular_tracks.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sporify/presentation/admin/pages/admin_youtube_music_page.dart';
+import 'package:sporify/presentation/admin/pages/admin_file_upload_page.dart';
+import 'package:sporify/presentation/admin/pages/admin_song_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -571,15 +574,48 @@ class _HomePageState extends State<HomePage>
                       await _launchSupportUrl();
                     },
                   ),
+                  // Developer Tools Section
                   const Divider(height: 32),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      'Developer Tools',
+                      style: TextStyle(
+                        color: context.isDarkMode
+                            ? Colors.grey[400]
+                            : Colors.grey[600],
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                   _buildDrawerItem(
-                    icon: Icons.logout,
-                    title: 'Logout',
-                    textColor: Colors.red,
-                    iconColor: Colors.red,
+                    icon: Icons.upload_file,
+                    title: 'Upload Song Files',
                     onTap: () {
                       Navigator.pop(context);
-                      _showLogoutDialog();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminFileUploadPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.library_music,
+                    title: 'Manage Songs',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminSongListPage(),
+                        ),
+                      );
                     },
                   ),
                 ],

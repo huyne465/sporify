@@ -84,11 +84,49 @@ class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
     );
 
     try {
-      await audioPlayer.setUrl(song.songUrl);
+      String audioUrl = song.songUrl;
+
+      // Handle YouTube Music URLs
+      if (song.songUrl.startsWith('youtube:')) {
+        final videoId = song.songUrl.replaceFirst('youtube:', '');
+        // For now, we'll show that it's a YouTube song but can't play directly
+        // In a full implementation, you'd need to use a library like youtube_explode_dart
+        // to extract the actual audio stream URL
+        print('YouTube Music video ID: $videoId');
+        print(
+          'Note: YouTube Music playback requires additional implementation',
+        );
+
+        // For demo purposes, we'll treat it as an error for now
+        throw Exception(
+          'YouTube Music playback not yet implemented. Video ID: $videoId',
+        );
+      }
+
+      // Handle SoundCloud URLs (commented out - requires implementation)
+      // if (song.songUrl.contains('soundcloud.com')) {
+      //   // SoundCloud handling would go here
+      //   print('SoundCloud URL detected: ${song.songUrl}');
+      // }
+
+      await audioPlayer.setUrl(audioUrl);
       songDuration = audioPlayer.duration ?? Duration.zero;
       emit(state.copyWith(isLoading: false, duration: songDuration));
     } catch (e) {
+      String errorMessage = 'Failed to load audio';
+
+      if (e.toString().contains('YouTube Music')) {
+        errorMessage = 'YouTube Music songs require special handling';
+      } else if (e.toString().contains('404')) {
+        errorMessage = 'Audio file not found (404)';
+      } else if (e.toString().contains('403')) {
+        errorMessage = 'Access denied to audio file (403)';
+      } else if (e.toString().contains('Invalid')) {
+        errorMessage = 'Invalid audio format or URL';
+      }
+
       emit(state.copyWith(isLoading: false));
+      print('Audio loading error: $errorMessage - ${e.toString()}');
     }
   }
 
