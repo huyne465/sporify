@@ -4,7 +4,7 @@ import 'package:sporify/data/models/auth/signin_user_request.dart';
 import 'package:sporify/data/models/auth/change_password_request.dart';
 import 'package:sporify/data/sources/auth/auth_firebase_service.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class AuthRepositoryImplementation extends AuthRepository {
   @override

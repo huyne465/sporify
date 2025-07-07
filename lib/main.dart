@@ -14,7 +14,7 @@ import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 Future<void> main() async {
   try {

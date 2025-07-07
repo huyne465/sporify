@@ -6,7 +6,7 @@ import 'package:sporify/common/widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/domain/usecases/auth/reset_password.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});

@@ -13,7 +13,7 @@ import 'package:sporify/domain/usecases/auth/signin_with_google.dart';
 import 'package:sporify/domain/usecases/auth/signin_with_facebook.dart';
 import 'package:sporify/presentation/auth/pages/signin.dart';
 import 'package:sporify/presentation/root/pages/main_navigation.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SignupPage extends StatefulWidget {

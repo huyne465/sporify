@@ -4,7 +4,7 @@ import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_albums.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class SpotifyAlbumsList extends StatefulWidget {
   const SpotifyAlbumsList({super.key});

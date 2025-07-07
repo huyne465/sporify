@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/presentation/artist/bloc/artist_songs_state.dart';
 
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class ArtistSongsCubit extends Cubit<ArtistSongsState> {
   ArtistSongsCubit() : super(ArtistSongsLoading());

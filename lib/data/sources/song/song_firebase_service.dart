@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sporify/data/models/song/song.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/domain/usecases/song/is_favorite.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 abstract class SongFirebaseService {
   Future<Either<String, List<SongEntity>>> getNewsSongs();

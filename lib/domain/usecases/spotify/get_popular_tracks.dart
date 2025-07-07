@@ -1,7 +1,7 @@
 import 'package:sporify/core/usecase/usecase.dart';
 import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
 import 'package:sporify/domain/repository/spotify/spotify_repository.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 // UseCase để lấy top tracks của một artist cụ thể
 class GetArtistTopTracksUseCase

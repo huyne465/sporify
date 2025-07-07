@@ -7,7 +7,7 @@ import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/data/models/auth/change_password_request.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
-import 'package:sporify/service_locator.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
