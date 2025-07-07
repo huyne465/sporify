@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
-import 'package:sporify/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/common/widgets/app_bar/app_bar.dart';
@@ -14,16 +14,14 @@ import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/root/widgets/new_song.dart';
 import 'package:sporify/presentation/root/widgets/play_list.dart';
 import 'package:sporify/presentation/root/widgets/artist_list.dart';
-import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/auth/pages/change_password.dart';
-import 'package:sporify/domain/repository/auth/auth.dart';
 import 'package:sporify/presentation/root/widgets/spotify_artist_list.dart';
 import 'package:sporify/presentation/root/widgets/spotify_albums_list.dart';
 import 'package:sporify/presentation/root/widgets/spotify_popular_tracks.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sporify/presentation/admin/pages/admin_youtube_music_page.dart';
 import 'package:sporify/presentation/admin/pages/admin_file_upload_page.dart';
 import 'package:sporify/presentation/admin/pages/admin_song_list_page.dart';
+import 'package:sporify/core/navigation/getx_navigator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -260,27 +258,7 @@ class _HomePageState extends State<HomePage>
   }
 
   void _showComingSoonSnackBar(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Icons.info_outline, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Text(
-              '$feature coming soon',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
+    AppNavigator.showComingSoon(feature);
   }
 
   Widget _homeTopArtistCard() {
@@ -416,62 +394,53 @@ class _HomePageState extends State<HomePage>
           children: [
             // Profile Header
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 80),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.brown.withOpacity(0.8), Colors.black],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                color: AppColors.primary.withOpacity(0.1),
+                border: Border(
+                  bottom: BorderSide(
+                    color: context.isDarkMode
+                        ? Colors.grey[700]!
+                        : Colors.grey[300]!,
+                    width: 1,
+                  ),
                 ),
               ),
               child: Column(
                 children: [
-                  Container(
-                    height: 80,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        initial,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: AppColors.primary,
+                    child: Text(
+                      initial,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     userName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
+                    style: TextStyle(
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: context.isDarkMode ? Colors.white : Colors.black,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                   if (userEmail.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       userEmail,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
                         fontSize: 14,
+                        color: context.isDarkMode
+                            ? Colors.white70
+                            : Colors.grey[600],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ],
@@ -484,155 +453,82 @@ class _HomePageState extends State<HomePage>
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   _buildDrawerItem(
-                    icon: Icons.person_outline,
+                    icon: Icons.person,
                     title: 'Profile',
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Navigate to profile page
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Profile page coming soon',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          backgroundColor: AppColors.primary,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          margin: const EdgeInsets.all(16),
-                        ),
-                      );
-                    },
+                    onTap: () => AppNavigator.showComingSoon('Profile page'),
                   ),
                   _buildDrawerItem(
-                    icon: Icons.lock_outline,
+                    icon: Icons.lock,
                     title: 'Change Password',
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChangePasswordPage(),
-                        ),
-                      );
+                      AppNavigator.back();
+                      AppNavigator.toChangePassword();
                     },
                   ),
                   _buildDrawerItem(
-                    icon: Icons.settings_outlined,
+                    icon: Icons.settings,
                     title: 'Settings',
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Navigate to settings page
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Settings page coming soon',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          backgroundColor: AppColors.primary,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          margin: const EdgeInsets.all(16),
-                        ),
-                      );
-                    },
+                    onTap: () => AppNavigator.showComingSoon('Settings page'),
                   ),
+
+                  const Divider(height: 1),
+
+                  // Admin Section (if needed)
                   _buildDrawerItem(
-                    icon: Icons.help_outline,
-                    title: 'Help & Support',
-                    onTap: () async {
-                      Navigator.pop(context);
-                      await _launchSupportUrl();
-                    },
-                  ),
-                  // Developer Tools Section
-                  const Divider(height: 32),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Text(
-                      'Developer Tools',
-                      style: TextStyle(
-                        color: context.isDarkMode
-                            ? Colors.grey[400]
-                            : Colors.grey[600],
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  _buildDrawerItem(
-                    icon: Icons.upload_file,
-                    title: 'Upload Song Files',
+                    icon: Icons.cloud_upload,
+                    title: 'Admin Upload',
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminFileUploadPage(),
-                        ),
-                      );
+                      AppNavigator.back();
+                      AppNavigator.toAdminUpload();
                     },
                   ),
                   _buildDrawerItem(
                     icon: Icons.library_music,
                     title: 'Manage Songs',
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminSongListPage(),
-                        ),
-                      );
+                      AppNavigator.back();
+                      AppNavigator.toAdminSongList();
                     },
+                  ),
+
+                  const Divider(height: 1),
+
+                  _buildDrawerItem(
+                    icon: Icons.help,
+                    title: 'Support',
+                    onTap: () async {
+                      AppNavigator.back();
+                      await _launchSupportUrl();
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.info,
+                    title: 'About',
+                    onTap: () => AppNavigator.showComingSoon('About page'),
                   ),
                 ],
               ),
             ),
 
-            // App Version
-            Padding(
+            // Logout Button
+            Container(
               padding: const EdgeInsets.all(16),
-              child: Text(
-                'Sporify v1.0.0',
-                style: TextStyle(
-                  color: context.isDarkMode
-                      ? Colors.grey[400]
-                      : Colors.grey[600],
-                  fontSize: 12,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: context.isDarkMode
+                        ? Colors.grey[700]!
+                        : Colors.grey[300]!,
+                    width: 1,
+                  ),
                 ),
+              ),
+              child: _buildDrawerItem(
+                icon: Icons.logout,
+                title: 'Logout',
+                onTap: () => _showLogoutDialog(),
+                textColor: Colors.red,
+                iconColor: Colors.red,
               ),
             ),
           ],
@@ -652,152 +548,129 @@ class _HomePageState extends State<HomePage>
       leading: Icon(
         icon,
         color:
-            iconColor ?? (context.isDarkMode ? Colors.white : Colors.black87),
+            iconColor ??
+            (context.isDarkMode ? Colors.white70 : Colors.grey[700]),
         size: 24,
       ),
       title: Text(
         title,
         style: TextStyle(
           color:
-              textColor ?? (context.isDarkMode ? Colors.white : Colors.black87),
+              textColor ?? (context.isDarkMode ? Colors.white : Colors.black),
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
       ),
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: context.isDarkMode ? Colors.grey[900] : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            'Logout',
-            style: TextStyle(
-              color: context.isDarkMode ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Text(
-            'Are you sure you want to logout?',
-            style: TextStyle(
-              color: context.isDarkMode ? Colors.white70 : Colors.black87,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: context.isDarkMode ? Colors.white70 : Colors.black54,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(context);
-
-                // Show loading indicator
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      backgroundColor: context.isDarkMode
-                          ? Colors.grey[900]
-                          : Colors.white,
-                      content: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(color: AppColors.primary),
-                          const SizedBox(width: 16),
-                          Text(
-                            'Signing out...',
-                            style: TextStyle(
-                              color: context.isDarkMode
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-
-                try {
-                  // Use repository sign out method which handles both Firebase and Google
-                  await sl<AuthRepository>().signOut();
-
-                  // Close loading dialog
-                  Navigator.pop(context);
-
-                  // Navigate to sign in page
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SignupOrSigninPage(),
-                    ),
-                    (route) => false,
-                  );
-                } catch (e) {
-                  // Close loading dialog
-                  Navigator.pop(context);
-
-                  // Show error message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Error signing out: ${e.toString()}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      margin: const EdgeInsets.all(16),
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.white),
+      builder: (context) => AlertDialog(
+        backgroundColor: context.isDarkMode ? Colors.grey[900] : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.logout, color: Colors.red, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              'Logout',
+              style: TextStyle(
+                color: context.isDarkMode ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
-        );
-      },
+        ),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(
+            color: context.isDarkMode ? Colors.white70 : Colors.grey[700],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: context.isDarkMode ? Colors.white70 : Colors.grey,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop(); // Close dialog
+              Navigator.of(context).pop(); // Close drawer
+
+              try {
+                await FirebaseAuth.instance.signOut();
+
+                // Navigate to signup/signin page
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SignupOrSigninPage(),
+                  ),
+                  (route) => false,
+                );
+
+                // Show success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(Icons.check_circle, color: Colors.white, size: 20),
+                        const SizedBox(width: 12),
+                        Text('Logged out successfully'),
+                      ],
+                    ),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.all(16),
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Text('Logout failed: ${e.toString()}'),
+                      ],
+                    ),
+                    backgroundColor: Colors.red,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.all(16),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -805,7 +678,6 @@ class _HomePageState extends State<HomePage>
     final Uri url = Uri.parse('https://support.spotify.com/us/');
 
     try {
-      // Try different launch modes for better compatibility
       bool launched = false;
 
       // First try: External application (default browser)
@@ -835,61 +707,19 @@ class _HomePageState extends State<HomePage>
 
       // If all methods fail, show error
       if (!launched) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.error_outline, color: Colors.white, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Could not open support page. Please check if you have a browser installed.',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
+        AppNavigator.showSnackbar(
+          title: 'Error',
+          message:
+              'Could not open support page. Please check if you have a browser installed.',
+          isError: true,
         );
       }
     } catch (e) {
-      // Handle any unexpected errors
       print('URL launch error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.error_outline, color: Colors.white, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Error opening support page: ${e.toString()}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.all(16),
-        ),
+      AppNavigator.showSnackbar(
+        title: 'Error',
+        message: 'Error opening support page: ${e.toString()}',
+        isError: true,
       );
     }
   }

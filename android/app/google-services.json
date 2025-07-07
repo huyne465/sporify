@@ -12,7 +12,20 @@
           "package_name": "com.example.sporify"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "91817906532-9qvvdibtr5rqj6u828pieosn1133b5p2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sporify",
+            "certificate_hash": "6dd93420c1cd749f6c708060de17b6cb5d39100b"
+          }
+        },
+        {
+          "client_id": "91817906532-nc285406kcjiplbuq0dv7gl5t5cg69qf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBL0tvKposHs4RwhsPdZ6x9Iq7wIuvghLA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "91817906532-nc285406kcjiplbuq0dv7gl5t5cg69qf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "91817906532-p9f29p4drtfls74749fj3ji831g3tlo0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sporify"
+              }
+            }
+          ]
         }
       }
     }

@@ -27,20 +27,21 @@ android {
     compileSdk 35
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     defaultConfig {
-        applicationId "com.example.sporify"  // <-- Đây là Package Name
-        minSdk 23
-        targetSdk 34
+        applicationId "com.example.sporify"
+        minSdk 21
+        targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -50,25 +51,18 @@ android {
             keyAlias "androiddebugkey"
             keyPassword "android"
         }
-        release {
-            storeFile file("path/to/your/sporify-release-key.keystore")
-            storePassword "your_store_password"
-            keyAlias "sporify-key-alias"
-            keyPassword "your_key_password"
-        }
     }
 
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
             minifyEnabled false
-            shrinkResources false  // Disable resource shrinking for debug builds
+            shrinkResources false
         }
         release {
-            signingConfig signingConfigs.release
-            minifyEnabled false  // Enable code shrinking
-            shrinkResources false  // This can now work with minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }
@@ -78,5 +72,11 @@ flutter {
 }
 
 dependencies {
-    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+    implementation 'com.google.firebase:firebase-auth:22.3.1'
+    implementation 'com.facebook.android:facebook-android-sdk:17.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

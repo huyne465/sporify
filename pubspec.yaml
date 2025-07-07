@@ -43,6 +43,7 @@ dependencies:
   file_picker: ^8.0.0+1
   image_picker: ^1.0.7
   path: ^1.8.3
+  get: ^4.6.6
 
 dependency_overrides:
   firebase_core: ^2.32.0

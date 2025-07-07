@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:get/get.dart';
 import 'package:sporify/core/configs/themes/app_theme.dart';
+import 'package:sporify/core/routes/app_pages.dart';
+import 'package:sporify/core/routes/app_routes.dart';
 import 'package:sporify/firebase_options.dart';
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
@@ -73,12 +76,14 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => GlobalMusicPlayerCubit()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, mode) => MaterialApp(
-          title: 'Flutter Demo',
+        builder: (context, mode) => GetMaterialApp(
+          title: 'Sporify',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: mode,
           debugShowCheckedModeBanner: false,
+          initialRoute: AppRoutes.splash,
+          getPages: AppPages.pages,
           home: const AppWithMiniPlayer(),
         ),
       ),
