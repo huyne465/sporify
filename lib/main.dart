@@ -15,6 +15,7 @@ import 'package:sporify/presentation/music_player/bloc/global_music_player_state
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
 import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/services/network_connectivity.dart';
 
 Future<void> main() async {
   try {
@@ -36,6 +37,10 @@ Future<void> main() async {
 
     print('📦 Initializing Dependencies...');
     await initializeDependencies();
+
+    // Initialize network connectivity monitoring
+    print('🌐 Initializing Network Connectivity Monitoring...');
+    sl<NetworkConnectivity>().initialize();
 
     print('✅ App initialized successfully');
     runApp(const MyApp());

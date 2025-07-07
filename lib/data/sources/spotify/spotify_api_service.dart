@@ -2,11 +2,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sporify/data/models/spotify/spotify_artist.dart';
 import 'package:sporify/core/configs/constants/app_spotify_keys.dart';
+import 'package:sporify/core/services/event_bus_service.dart';
+import 'package:sporify/core/services/network_connectivity.dart';
+import 'package:sporify/core/events/network_events.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class SpotifyApiServiceImpl extends SpotifyApiService {
   final String baseUrl = 'https://api.spotify.com/v1';
   String? _accessToken;
   DateTime? _tokenExpiry;
+  final EventBusService _eventBusService = sl<EventBusService>();
+  final NetworkConnectivity _networkConnectivity = sl<NetworkConnectivity>();
+
   Future<String?> getAccessToken() async {
     // Check if token is still valid
     if (_accessToken != null &&
@@ -16,6 +23,17 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
     }
 
     try {
+      // Check network connectivity first
+      if (!_networkConnectivity.hasInternetAccess) {
+        _eventBusService.eventBus.fire(
+          ApiErrorEvent(
+            message: "No internet connection",
+            endpoint: "https://accounts.spotify.com/api/token",
+          ),
+        );
+        return null;
+      }
+
       final credentials = base64Encode(
         utf8.encode(
           '${AppSpotifyKeys.clientId}:${AppSpotifyKeys.clientSecret}',
@@ -41,10 +59,52 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
         return _accessToken;
       } else {
         print('Spotify API Error: ${response.statusCode} - ${response.body}');
+        _eventBusService.eventBus.fire(
+          ApiErrorEvent(
+            message:
+                "Failed to authenticate with Spotify API: ${response.statusCode}",
+            endpoint: "https://accounts.spotify.com/api/token",
+            error: response.body,
+          ),
+        );
         return null;
       }
     } catch (e) {
       print('Error getting Spotify access token: $e');
+      _eventBusService.eventBus.fire(
+        ApiErrorEvent(
+          message: "Network error when connecting to Spotify API",
+          endpoint: "https://accounts.spotify.com/api/token",
+          error: e,
+        ),
+      );
+      return null;
+    }
+  }
+
+  // Wrap API calls with network connectivity check
+  Future<T?> _safeApiCall<T>({
+    required String endpoint,
+    required Future<T> Function() apiCall,
+  }) async {
+    try {
+      if (!_networkConnectivity.hasInternetAccess) {
+        _eventBusService.eventBus.fire(
+          ApiErrorEvent(message: "No internet connection", endpoint: endpoint),
+        );
+        return null;
+      }
+
+      return await apiCall();
+    } catch (e) {
+      print('API Error ($endpoint): $e');
+      _eventBusService.eventBus.fire(
+        ApiErrorEvent(
+          message: "Network error during API call",
+          endpoint: endpoint,
+          error: e,
+        ),
+      );
       return null;
     }
   }
@@ -55,22 +115,29 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
       final token = await getAccessToken();
       if (token == null) throw Exception('Failed to get access token');
 
-      final response = await http.get(
-        Uri.parse(
-          '$baseUrl/search?q=${Uri.encodeComponent(query)}&type=artist&limit=20',
-        ),
-        headers: {'Authorization': 'Bearer $token'},
+      final endpoint =
+          '$baseUrl/search?q=${Uri.encodeComponent(query)}&type=artist&limit=20';
+      final result = await _safeApiCall(
+        endpoint: endpoint,
+        apiCall: () async {
+          final response = await http.get(
+            Uri.parse(endpoint),
+            headers: {'Authorization': 'Bearer $token'},
+          );
+
+          if (response.statusCode == 200) {
+            final data = json.decode(response.body);
+            final artists = data['artists']['items'] as List<dynamic>;
+            return artists
+                .map((artist) => SpotifyArtistModel.fromJson(artist))
+                .toList();
+          } else {
+            throw Exception('Failed to search artists: ${response.statusCode}');
+          }
+        },
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final artists = data['artists']['items'] as List<dynamic>;
-        return artists
-            .map((artist) => SpotifyArtistModel.fromJson(artist))
-            .toList();
-      } else {
-        throw Exception('Failed to search artists');
-      }
+      return result ?? [];
     } catch (e) {
       throw Exception('Error searching artists: $e');
     }

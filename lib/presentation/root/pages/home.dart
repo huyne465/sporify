@@ -22,6 +22,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/presentation/admin/pages/admin_file_upload_page.dart';
 import 'package:sporify/presentation/admin/pages/admin_song_list_page.dart';
 import 'package:sporify/core/navigation/getx_navigator.dart';
+import 'dart:async';
+import 'package:sporify/core/services/event_bus_service.dart';
+import 'package:sporify/core/services/connection_error_handler.dart';
+import 'package:sporify/core/events/network_events.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -33,11 +38,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  StreamSubscription? _networkConnectedSubscription;
+  StreamSubscription? _networkDisconnectedSubscription;
+  final ConnectionErrorHandler _connectionErrorHandler =
+      sl<ConnectionErrorHandler>();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+
+    // Initialize connection error handler
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _connectionErrorHandler.initialize(context);
+    });
+
+    // Listen for network reconnection events
+    _networkConnectedSubscription = sl<EventBusService>().eventBus
+        .on<NetworkConnectedEvent>()
+        .listen((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.wifi, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Text('Internet connection restored'),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _networkConnectedSubscription?.cancel();
+    _networkDisconnectedSubscription?.cancel();
+    super.dispose();
   }
 
   @override

@@ -41,9 +41,17 @@ import 'package:sporify/data/repositories/favorite_songs_repository.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
 import 'package:sporify/presentation/spotify/bloc/spotify_player_cubit.dart';
 import 'package:sporify/domain/usecases/spotify/get_track_with_preview.dart';
+import 'package:sporify/core/services/event_bus_service.dart';
+import 'package:sporify/core/services/network_connectivity.dart';
+import 'package:sporify/core/services/connection_error_handler.dart';
 
 final sl = GetIt.instance;
 Future<void> initializeDependencies() async {
+  //network services
+  sl.registerSingleton<EventBusService>(EventBusService());
+  sl.registerSingleton<NetworkConnectivity>(NetworkConnectivity());
+  sl.registerSingleton<ConnectionErrorHandler>(ConnectionErrorHandler());
+
   //auth
   sl.registerSingleton<AuthFirebaseService>(AuthFirebaseServiceImpl());
   sl.registerSingleton<AuthRepository>(AuthRepositoryImplementation());
