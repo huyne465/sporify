@@ -19,11 +19,7 @@ class ApiErrorEvent extends NetworkEvent {
   final String endpoint;
   final dynamic error;
 
-  ApiErrorEvent({
-    required this.message,
-    required this.endpoint,
-    this.error,
-  });
+  ApiErrorEvent({required this.message, required this.endpoint, this.error});
 
   @override
   String toString() => 'ApiErrorEvent: $message, Endpoint: $endpoint';
@@ -32,9 +28,9 @@ class ApiErrorEvent extends NetworkEvent {
 // Sự kiện cho các hành động thử lại sau khi khôi phục mạng
 class RetryActionEvent extends NetworkEvent {
   final Function action;
-  
+
   RetryActionEvent(this.action);
-  
+
   @override
   String toString() => 'RetryActionEvent';
 }

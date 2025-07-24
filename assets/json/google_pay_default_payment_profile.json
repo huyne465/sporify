@@ -1,0 +1,38 @@
+{
+  "provider": "google_pay",
+  "data": {
+    "environment": "TEST",
+    "apiVersion": 2,
+    "apiVersionMinor": 0,
+    "allowedPaymentMethods": [
+      {
+        "type": "CARD",
+        "tokenizationSpecification": {
+          "type": "PAYMENT_GATEWAY",
+          "parameters": {
+            "gateway": "stripe",
+            "stripe:version": "2020-08-27",
+            "stripe:publishableKey": "pk_test_TYooMQauvdEDq54NiTphI7jx"
+          }
+        },
+        "parameters": {
+          "allowedCardNetworks": ["VISA", "MASTERCARD", "AMEX"],
+          "allowedAuthMethods": ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+          "billingAddressRequired": true,
+          "billingAddressParameters": {
+            "format": "FULL",
+            "phoneNumberRequired": true
+          }
+        }
+      }
+    ],
+    "merchantInfo": {
+      "merchantId": "BCR2DN4TTXY3TRC4",
+      "merchantName": "Sporify Premium"
+    },
+    "transactionInfo": {
+      "countryCode": "US",
+      "currencyCode": "USD"
+    }
+  }
+}

@@ -10,6 +10,7 @@ import 'package:sporify/data/sources/song/song_firebase_service.dart';
 import 'package:sporify/data/sources/lyrics/lyrics_api_service.dart';
 import 'package:sporify/data/sources/spotify/spotify_api_service.dart';
 import 'package:sporify/data/sources/spotify/spotify_player_service.dart';
+import 'package:sporify/data/sources/user/user_premium_service.dart';
 import 'package:sporify/domain/repository/auth/auth.dart';
 import 'package:sporify/domain/repository/song/song.dart';
 import 'package:sporify/domain/repository/lyrics/lyrics.dart';
@@ -30,6 +31,7 @@ import 'package:sporify/domain/usecases/spotify/get_artist_top_tracks.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_artists.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_tracks.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_albums.dart';
+import 'package:sporify/domain/usecases/user/user_premium.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/domain/usecases/song/get_songs_by_artist.dart';
 import 'package:sporify/domain/usecases/auth/change_password.dart';
@@ -117,4 +119,14 @@ Future<void> initializeDependencies() async {
 
   // Spotify Player (preview only)
   sl.registerLazySingleton(() => SpotifyPlayerCubit());
+
+  // User Premium services
+  sl.registerSingleton<UserPremiumService>(UserPremiumServiceImpl());
+  sl.registerSingleton<UpdateUserToPremiumUseCase>(
+    UpdateUserToPremiumUseCase(),
+  );
+  sl.registerSingleton<CheckUserPremiumStatusUseCase>(
+    CheckUserPremiumStatusUseCase(),
+  );
+  sl.registerSingleton<GetUserPremiumInfoUseCase>(GetUserPremiumInfoUseCase());
 }

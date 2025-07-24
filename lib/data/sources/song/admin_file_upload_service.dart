@@ -34,7 +34,7 @@ class AdminFileUploadService {
       // Upload audio file
       final String? audioUrl = await _storageService.uploadAudioFile(
         audioFile,
-        '${title}_${artist}.${audioFile.path.split('.').last}',
+        '${title}_$artist.${audioFile.path.split('.').last}',
       );
 
       if (audioUrl == null) {

@@ -6,7 +6,7 @@ import 'package:sporify/core/events/network_events.dart';
 import 'package:sporify/di/service_locator.dart';
 
 class SpotifySearchWidget extends StatefulWidget {
-  const SpotifySearchWidget({Key? key}) : super(key: key);
+  const SpotifySearchWidget({super.key});
 
   @override
   State<SpotifySearchWidget> createState() => _SpotifySearchWidgetState();

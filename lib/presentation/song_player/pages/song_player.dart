@@ -7,11 +7,13 @@ import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:sporify/domain/usecases/user/user_premium.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
 import 'package:sporify/presentation/lyrics/widgets/lyrics_view.dart';
 import 'package:sporify/presentation/playlist/widgets/add_to_playlist_dialog.dart';
+import 'package:sporify/di/service_locator.dart';
 
 class SongPlayerPage extends StatefulWidget {
   final SongEntity songEntity;
@@ -67,9 +69,7 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
             title: Text('Now Playing', style: TextStyle(fontSize: 18)),
             action: IconButton(
               onPressed: () {
-                setState(() {
-                  _showLyrics = !_showLyrics;
-                });
+                _toggleLyrics();
               },
               icon: Icon(_showLyrics ? Icons.music_note : Icons.lyrics),
             ),
@@ -100,6 +100,97 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
       _lastLoadedSongId = song.songId;
       _lyricsCubit.getLyrics(song.artist, song.title);
     }
+  }
+
+  Future<void> _toggleLyrics() async {
+    try {
+      // Check if user has premium access
+      final result = await sl<CheckUserPremiumStatusUseCase>().call();
+
+      result.fold(
+        (failure) {
+          _showPremiumRequiredDialog();
+        },
+        (hasPremium) {
+          if (hasPremium) {
+            setState(() {
+              _showLyrics = !_showLyrics;
+            });
+          } else {
+            _showPremiumRequiredDialog();
+          }
+        },
+      );
+    } catch (e) {
+      _showPremiumRequiredDialog();
+    }
+  }
+
+  void _showPremiumRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Row(
+          children: [
+            Icon(Icons.workspace_premium, color: AppColors.primary, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              'Premium Feature',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.lyrics,
+              size: 48,
+              color: AppColors.primary.withOpacity(0.7),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Lyrics are available for Premium subscribers only.',
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Upgrade to Premium to enjoy lyrics and many other features!',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Maybe Later',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, '/premium');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Upgrade Now'),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _songDetail(BuildContext context) {

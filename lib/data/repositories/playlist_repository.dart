@@ -320,14 +320,14 @@ class PlaylistRepository {
 }
 
 Future<String> generateShareableLink(String playlistId) async {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final user = _auth.currentUser;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final user = auth.currentUser;
   if (user == null) throw Exception('User not authenticated');
 
   try {
     // Create a public shareable document
-    final shareableRef = _firestore.collection('SharedPlaylists').doc();
+    final shareableRef = firestore.collection('SharedPlaylists').doc();
 
     await shareableRef.set({
       'playlistId': playlistId,
@@ -346,9 +346,9 @@ Future<String> generateShareableLink(String playlistId) async {
 }
 
 Future<PlaylistModel?> getSharedPlaylist(String shareId) async {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   try {
-    final shareDoc = await _firestore
+    final shareDoc = await firestore
         .collection('SharedPlaylists')
         .doc(shareId)
         .get();
@@ -365,7 +365,7 @@ Future<PlaylistModel?> getSharedPlaylist(String shareId) async {
     }
 
     // Get the actual playlist
-    final playlistDoc = await _firestore
+    final playlistDoc = await firestore
         .collection('Users')
         .doc(shareData['userId'])
         .collection('Playlists')

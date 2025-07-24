@@ -47,6 +47,7 @@ dependencies:
   event_bus: ^2.0.0
   connectivity_plus: ^4.0.2
   internet_connection_checker: ^1.0.0+1
+  pay: ^3.2.1
 
 dependency_overrides:
   firebase_core: ^2.32.0
@@ -77,6 +78,7 @@ flutter:
   - assets/fonts/
   - assets/images/
   - assets/vectors/
+  - assets/json/
 
   fonts:
   - family: Satoshi

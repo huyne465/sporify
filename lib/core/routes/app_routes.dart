@@ -15,6 +15,7 @@ class AppRoutes {
   static const String search = '/search';
   static const String favorite = '/favorite';
   static const String profile = '/profile';
+  static const String premium = '/premium';
 
   // Music Player Routes
   static const String songPlayer = '/song-player';
