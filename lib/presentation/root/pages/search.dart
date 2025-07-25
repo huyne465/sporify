@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
-import 'package:sporify/common/widgets/app_bar/app_bar.dart';
-import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
+import 'package:sporify/common/base_widgets/app_bar/app_bar.dart';
+import 'package:sporify/common/base_widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';

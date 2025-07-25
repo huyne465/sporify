@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
 import 'package:sporify/domain/usecases/spotify/search_spotify_artists.dart';
 import 'package:sporify/presentation/spotify/bloc/spotify_popular_artists_state.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class SpotifyPopularArtistsCubit extends Cubit<SpotifyPopularArtistsState> {
   SpotifyPopularArtistsCubit() : super(SpotifyPopularArtistsInitial());

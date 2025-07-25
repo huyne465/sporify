@@ -4,7 +4,7 @@ import 'package:sporify/common/bloc/favorite_button/favorite_button_cubit.dart';
 import 'package:sporify/common/bloc/favorite_button/favorite_button_state.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
-import 'package:sporify/common/widgets/playlist_button/add_to_playlist_button.dart';
+import 'package:sporify/common/base_widgets/playlist_button/add_to_playlist_button.dart';
 
 class FavoriteButton extends StatelessWidget {
   final SongEntity songEntity;

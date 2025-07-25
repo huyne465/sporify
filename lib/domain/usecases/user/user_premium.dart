@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:sporify/core/usecase/usecase.dart';
-import 'package:sporify/data/sources/user/user_premium_service.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/domain/usecases/usecase.dart';
+import 'package:sporify/data/dataSources/user/user_premium_service.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class UpdateUserToPremiumUseCase
     implements UseCase<Either<String, bool>, String> {

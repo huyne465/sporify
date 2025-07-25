@@ -4,26 +4,27 @@ import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/domain/entities/artist/artist.dart';
 import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
 import 'package:sporify/data/models/playlist/playlist.dart';
-
-// Import all pages
-import 'package:sporify/presentation/splash/pages/splash.dart';
-import 'package:sporify/presentation/intro/pages/get_started.dart';
-import 'package:sporify/presentation/choose_mode/pages/choose_mode.dart';
-import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
-import 'package:sporify/presentation/auth/pages/signup.dart';
-import 'package:sporify/presentation/auth/pages/signin.dart';
-import 'package:sporify/presentation/auth/pages/reset_password.dart';
-import 'package:sporify/presentation/auth/pages/change_password.dart';
-import 'package:sporify/presentation/root/pages/main_navigation.dart';
-import 'package:sporify/presentation/root/pages/home.dart';
-import 'package:sporify/presentation/root/pages/search.dart';
-import 'package:sporify/presentation/root/pages/favorite.dart';
-import 'package:sporify/presentation/song_player/pages/song_player.dart';
-import 'package:sporify/presentation/artist/pages/artist_detail.dart';
-import 'package:sporify/presentation/spotify/pages/spotify_artist_detail_clean.dart';
-import 'package:sporify/presentation/playlist/pages/playlist_detail.dart';
 import 'package:sporify/presentation/admin/pages/admin_file_upload_page.dart';
 import 'package:sporify/presentation/admin/pages/admin_song_list_page.dart';
+import 'package:sporify/presentation/artist/pages/artist_detail.dart';
+import 'package:sporify/presentation/auth/pages/change_password.dart';
+import 'package:sporify/presentation/auth/pages/reset_password.dart';
+import 'package:sporify/presentation/auth/pages/signin.dart';
+import 'package:sporify/presentation/auth/pages/signup.dart';
+import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
+import 'package:sporify/presentation/choose_mode/pages/choose_mode.dart';
+import 'package:sporify/presentation/intro/pages/get_started.dart';
+import 'package:sporify/presentation/playlist/pages/playlist_detail.dart';
+import 'package:sporify/presentation/root/pages/favorite.dart';
+import 'package:sporify/presentation/root/pages/home.dart';
+import 'package:sporify/presentation/root/pages/main_navigation.dart';
+import 'package:sporify/presentation/root/pages/premium.dart';
+import 'package:sporify/presentation/root/pages/search.dart';
+import 'package:sporify/presentation/song_player/pages/song_player.dart';
+import 'package:sporify/presentation/splash/pages/splash.dart';
+import 'package:sporify/presentation/spotify/pages/spotify_artist_detail_clean.dart';
+
+// Import all pages
 
 class AppPages {
   static final List<GetPage> pages = [
@@ -99,6 +100,12 @@ class AppPages {
     GetPage(
       name: AppRoutes.favorite,
       page: () => const FavoritePage(),
+      transition: Transition.fade,
+      transitionDuration: const Duration(milliseconds: 200),
+    ),
+    GetPage(
+      name: AppRoutes.premium,
+      page: () => const PremiumPage(),
       transition: Transition.fade,
       transitionDuration: const Duration(milliseconds: 200),
     ),

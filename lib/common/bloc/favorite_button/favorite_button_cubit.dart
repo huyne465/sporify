@@ -2,7 +2,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:sporify/common/bloc/favorite_button/favorite_button_state.dart';
 import 'package:sporify/domain/usecases/song/add_or_remove_song.dart';
 import 'package:sporify/domain/usecases/song/is_favorite.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class FavoriteButtonCubit extends Cubit<FavoriteButtonState> {
   FavoriteButtonCubit() : super(FavoriteButtonInitial());

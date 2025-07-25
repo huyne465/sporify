@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:sporify/core/services/event_bus_service.dart';
-import 'package:sporify/core/services/network_connectivity.dart';
+import 'package:sporify/core/services/simple_network_check.dart';
 import 'package:sporify/core/events/network_events.dart';
 
 class ConnectionErrorHandler {
@@ -11,7 +11,6 @@ class ConnectionErrorHandler {
   ConnectionErrorHandler._internal();
 
   final EventBusService _eventBusService = EventBusService();
-  final NetworkConnectivity _networkConnectivity = NetworkConnectivity();
   final List<Function> _retryQueue = [];
   StreamSubscription? _networkConnectedSubscription;
 
@@ -112,11 +111,12 @@ class ConnectionErrorHandler {
     _retryQueue.clear();
   }
 
-  bool get hasInternetAccess => _networkConnectivity.hasInternetAccess;
+  bool get hasInternetAccess =>
+      true; // Using simple check now, assume connected
 
   Future<bool> checkConnection(BuildContext context) async {
-    await _networkConnectivity.checkConnectivity();
-    if (!_networkConnectivity.hasInternetAccess) {
+    final hasConnection = await SimpleNetworkCheck.hasWorkingConnection();
+    if (!hasConnection) {
       _showOfflineBanner(context);
       return false;
     }

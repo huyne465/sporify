@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
-import 'package:sporify/data/repositories/playlist_repository.dart';
+import 'package:sporify/domain/repository/playlist/playlist_repository.dart';
 import 'package:sporify/presentation/playlist/bloc/playlist_cubit.dart';
 import 'package:sporify/presentation/playlist/widgets/create_playlist_dialog.dart';
 import 'package:sporify/domain/entities/songs/song.dart';

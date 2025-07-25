@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:sporify/data/sources/storage/firebase_storage_service.dart';
+import 'package:sporify/data/dataSources/storage/firebase_storage_service.dart';
 
 class AdminFileUploadService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

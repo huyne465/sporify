@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:sporify/data/sources/spotify/spotify_api_service.dart';
+import 'package:sporify/data/dataSources/spotify/spotify_api_service.dart';
 
 abstract class SpotifyPlayerService {
   Future<bool> playTrack(String trackUri, {String? deviceId});

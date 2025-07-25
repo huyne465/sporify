@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sporify/common/widgets/app_bar/app_bar.dart';
+import 'package:sporify/common/base_widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/artist/artist.dart';

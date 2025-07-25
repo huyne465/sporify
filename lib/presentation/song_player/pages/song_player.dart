@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:social_sharing_plus/social_sharing_plus.dart';
-import 'package:sporify/common/widgets/app_bar/app_bar.dart';
-import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
+import 'package:sporify/common/base_widgets/app_bar/app_bar.dart';
+import 'package:sporify/common/base_widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/domain/usecases/user/user_premium.dart';
-import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
-import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
+import 'package:sporify/core/di/service_locator.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_cubit.dart';
 import 'package:sporify/presentation/lyrics/widgets/lyrics_view.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
+import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/playlist/widgets/add_to_playlist_dialog.dart';
-import 'package:sporify/di/service_locator.dart';
 
 class SongPlayerPage extends StatefulWidget {
   final SongEntity songEntity;
@@ -176,7 +176,6 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop();
               Navigator.pushNamed(context, '/premium');
             },
             style: ElevatedButton.styleFrom(

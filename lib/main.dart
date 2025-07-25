@@ -9,13 +9,15 @@ import 'package:sporify/core/configs/themes/app_theme.dart';
 import 'package:sporify/core/routes/app_pages.dart';
 import 'package:sporify/core/routes/app_routes.dart';
 import 'package:sporify/firebase_options.dart';
+import 'package:sporify/core/di/service_locator.dart';
+import 'package:sporify/core/services/network_connectivity.dart';
+import 'package:sporify/presentation/root/widgets/network_status_banner.dart';
+
 import 'package:sporify/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
 import 'package:sporify/presentation/splash/pages/splash.dart';
-import 'package:sporify/di/service_locator.dart';
-import 'package:sporify/core/services/network_connectivity.dart';
 
 Future<void> main() async {
   try {
@@ -101,17 +103,19 @@ class AppWithMiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: const SplashPage(),
-      bottomNavigationBar:
-          BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
-            builder: (context, state) {
-              if (state.currentSong == null) {
-                return const SizedBox.shrink();
-              }
-              return const MiniPlayer();
-            },
-          ),
+    return NetworkStatusBanner(
+      child: Scaffold(
+        body: const SplashPage(),
+        bottomNavigationBar:
+            BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
+              builder: (context, state) {
+                if (state.currentSong == null) {
+                  return const SizedBox.shrink();
+                }
+                return const MiniPlayer();
+              },
+            ),
+      ),
     );
   }
 }

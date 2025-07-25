@@ -1,4 +1,4 @@
-import 'package:sporify/data/sources/spotify/spotify_api_service.dart';
+import 'package:sporify/data/dataSources/spotify/spotify_api_service.dart';
 import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
 import 'package:sporify/domain/repository/spotify/spotify_repository.dart';
 

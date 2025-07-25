@@ -3,7 +3,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/domain/usecases/song/get_new_songs.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class GlobalMusicPlayerCubit extends HydratedCubit<GlobalMusicPlayerState> {
   final AudioPlayer audioPlayer = AudioPlayer();

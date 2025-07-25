@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pay/pay.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
-import 'package:sporify/common/widgets/app_bar/app_bar.dart';
+import 'package:sporify/common/base_widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/navigation/getx_navigator.dart';
 import 'package:sporify/data/models/subscription/subscription_plan.dart';
 import 'package:sporify/domain/usecases/user/user_premium.dart';
+import 'package:sporify/core/di/service_locator.dart';
 import 'package:sporify/presentation/music_player/widgets/mini_player.dart';
-import 'package:sporify/di/service_locator.dart';
 
 class PremiumPage extends StatefulWidget {
   const PremiumPage({super.key});
@@ -26,7 +26,7 @@ class _PremiumPageState extends State<PremiumPage> {
     super.initState();
     _loadGooglePayConfig();
     selectedPlan =
-        SubscriptionPlan.getPlans()[1]; // Default to 3 months (popular)
+        SubscriptionPlan.getPlans()[1]; // Default to 1 months (popular)
   }
 
   Future<void> _loadGooglePayConfig() async {
@@ -188,7 +188,7 @@ class _PremiumPageState extends State<PremiumPage> {
 
     return Scaffold(
       appBar: BasicAppBar(
-        hideback: false,
+        hideback: true,
         title: Text(
           'Premium Plans',
           style: TextStyle(

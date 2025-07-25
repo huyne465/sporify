@@ -1,7 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/domain/usecases/spotify/get_track_with_preview.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 abstract class SpotifyPlayerState {}
 

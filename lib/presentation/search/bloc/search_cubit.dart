@@ -4,7 +4,7 @@ import 'package:sporify/domain/entities/songs/song.dart';
 import 'package:sporify/domain/usecases/song/get_new_songs.dart';
 import 'package:sporify/domain/usecases/spotify/search_spotify_artists.dart';
 import 'package:sporify/presentation/search/bloc/search_state.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   Timer? _debounceTimer;

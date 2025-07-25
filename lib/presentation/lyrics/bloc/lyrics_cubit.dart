@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/domain/entities/lyrics/lyrics.dart';
 import 'package:sporify/domain/usecases/lyrics/get_lyrics.dart';
 import 'package:sporify/presentation/lyrics/bloc/lyrics_state.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class LyricsCubit extends Cubit<LyricsState> {
   LyricsCubit() : super(LyricsLoading());

@@ -4,9 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sporify/presentation/auth/pages/signup_or_signin.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_state.dart';
+import 'package:sporify/presentation/root/widgets/check_premium.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
-import 'package:sporify/common/widgets/app_bar/app_bar.dart';
+import 'package:sporify/common/base_widgets/app_bar/app_bar.dart';
 import 'package:sporify/core/configs/assets/app_images.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
@@ -23,7 +24,7 @@ import 'dart:async';
 import 'package:sporify/core/services/event_bus_service.dart';
 import 'package:sporify/core/services/connection_error_handler.dart';
 import 'package:sporify/core/events/network_events.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -516,18 +517,29 @@ class _HomePageState extends State<HomePage>
                   // Admin Section (if needed)
                   _buildDrawerItem(
                     icon: Icons.cloud_upload,
-                    title: 'Admin Upload',
+                    title: 'Upload Music',
                     onTap: () {
-                      AppNavigator.back();
-                      AppNavigator.toAdminUpload();
+                      // Use static method to check premium access
+                      CheckPremium.checkPremiumAccess(
+                        context,
+                        onPremiumAccess: () {
+                          AppNavigator.back();
+                          AppNavigator.toAdminUpload();
+                        },
+                      );
                     },
                   ),
                   _buildDrawerItem(
                     icon: Icons.library_music,
                     title: 'Manage Songs',
                     onTap: () {
-                      AppNavigator.back();
-                      AppNavigator.toAdminSongList();
+                      CheckPremium.checkPremiumAccess(
+                        context,
+                        onPremiumAccess: () {
+                          AppNavigator.back();
+                          AppNavigator.toAdminSongList();
+                        },
+                      );
                     },
                   ),
 

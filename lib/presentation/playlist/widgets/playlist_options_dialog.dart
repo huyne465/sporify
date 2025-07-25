@@ -4,7 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:social_sharing_plus/social_sharing_plus.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/data/models/playlist/playlist.dart';
-import 'package:sporify/data/repositories/playlist_repository.dart';
+import 'package:sporify/domain/repository/playlist/playlist_repository.dart';
 
 class PlaylistOptionsDialog extends StatelessWidget {
   final PlaylistModel playlist;

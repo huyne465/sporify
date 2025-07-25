@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sporify/data/repositories/favorite_songs_repository.dart';
+import 'package:sporify/domain/repository/favorite/favorite_songs_repository.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
 
 abstract class FavoriteSongsState {}

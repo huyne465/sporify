@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
-import 'package:sporify/common/widgets/app_bar/app_bar.dart';
-import 'package:sporify/common/widgets/button/basic_button.dart';
+import 'package:sporify/common/base_widgets/app_bar/app_bar.dart';
+import 'package:sporify/common/base_widgets/button/basic_button.dart';
 import 'package:sporify/core/configs/assets/app_vectors.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/domain/usecases/auth/reset_password.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});

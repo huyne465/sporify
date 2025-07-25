@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sporify/data/repositories/playlist_repository.dart';
+import 'package:sporify/domain/repository/playlist/playlist_repository.dart';
 import 'package:sporify/data/models/playlist/playlist.dart';
 
 abstract class PlaylistState {}

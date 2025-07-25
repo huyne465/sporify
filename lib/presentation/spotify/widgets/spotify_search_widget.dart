@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sporify/core/services/event_bus_service.dart';
 import 'package:sporify/core/services/connection_error_handler.dart';
 import 'package:sporify/core/events/network_events.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class SpotifySearchWidget extends StatefulWidget {
   const SpotifySearchWidget({super.key});

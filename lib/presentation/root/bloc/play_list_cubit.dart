@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/domain/usecases/song/get_play_list.dart';
 import 'package:sporify/presentation/root/bloc/play_list_state.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class PlayListCubit extends Cubit<PlayListState> {
   PlayListCubit() : super(PlayListLoading());

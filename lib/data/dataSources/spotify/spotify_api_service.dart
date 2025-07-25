@@ -1,18 +1,17 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:sporify/data/models/spotify/spotify_artist.dart';
-import 'package:sporify/core/configs/constants/app_spotify_keys.dart';
+import 'package:sporify/core/constants/app_spotify_keys.dart';
 import 'package:sporify/core/services/event_bus_service.dart';
-import 'package:sporify/core/services/network_connectivity.dart';
+import 'package:sporify/core/services/simple_network_check.dart';
 import 'package:sporify/core/events/network_events.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 
 class SpotifyApiServiceImpl extends SpotifyApiService {
   final String baseUrl = 'https://api.spotify.com/v1';
   String? _accessToken;
   DateTime? _tokenExpiry;
   final EventBusService _eventBusService = sl<EventBusService>();
-  final NetworkConnectivity _networkConnectivity = sl<NetworkConnectivity>();
 
   Future<String?> getAccessToken() async {
     // Check if token is still valid
@@ -23,8 +22,9 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
     }
 
     try {
-      // Check network connectivity first
-      if (!_networkConnectivity.hasInternetAccess) {
+      // Check network connectivity first using simple check
+      final hasConnection = await SimpleNetworkCheck.hasWorkingConnection();
+      if (!hasConnection) {
         _eventBusService.eventBus.fire(
           ApiErrorEvent(
             message: "No internet connection",
@@ -88,7 +88,8 @@ class SpotifyApiServiceImpl extends SpotifyApiService {
     required Future<T> Function() apiCall,
   }) async {
     try {
-      if (!_networkConnectivity.hasInternetAccess) {
+      final hasConnection = await SimpleNetworkCheck.hasWorkingConnection();
+      if (!hasConnection) {
         _eventBusService.eventBus.fire(
           ApiErrorEvent(message: "No internet connection", endpoint: endpoint),
         );

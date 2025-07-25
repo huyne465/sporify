@@ -6,7 +6,7 @@ import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/domain/usecases/spotify/get_popular_tracks.dart';
 import 'package:sporify/domain/entities/spotify/spotify_artist.dart';
-import 'package:sporify/di/service_locator.dart';
+import 'package:sporify/core/di/service_locator.dart';
 import 'package:sporify/presentation/spotify/bloc/spotify_player_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 

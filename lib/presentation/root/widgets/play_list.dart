@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
-import 'package:sporify/common/widgets/favorite_button/favorite_button.dart';
+import 'package:sporify/common/base_widgets/favorite_button/favorite_button.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
 import 'package:sporify/core/constants/app_urls.dart';
 import 'package:sporify/domain/entities/songs/song.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sporify/core/configs/cache/cache_config.dart';
 import 'package:sporify/presentation/music_player/bloc/global_music_player_cubit.dart';
 import 'package:sporify/presentation/root/bloc/play_list_cubit.dart';
 import 'package:sporify/presentation/root/bloc/play_list_state.dart';
 import 'package:sporify/presentation/song_player/pages/song_player.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:sporify/core/configs/cache/cache_config.dart';
 
 class PlayList extends StatelessWidget {
   const PlayList({super.key});

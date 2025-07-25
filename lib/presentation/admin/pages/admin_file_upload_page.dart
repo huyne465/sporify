@@ -4,7 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sporify/common/helpers/is_dark.dart';
 import 'package:sporify/core/configs/themes/app_colors.dart';
-import 'package:sporify/data/sources/song/admin_file_upload_service.dart';
+import 'package:sporify/data/dataSources/song/admin_file_upload_service.dart';
 
 class AdminFileUploadPage extends StatefulWidget {
   const AdminFileUploadPage({super.key});
