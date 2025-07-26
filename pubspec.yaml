@@ -48,6 +48,17 @@ dependencies:
   connectivity_plus: ^4.0.2
   internet_connection_checker: ^1.0.0+1
   pay: ^3.2.1
+  icons_launcher: ^3.0.1
+
+
+
+icons_launcher:
+  image_path: "assets/images/app_icon.png"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
 
 dependency_overrides:
   firebase_core: ^2.32.0

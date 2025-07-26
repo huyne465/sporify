@@ -118,7 +118,9 @@ class _FavoritePageState extends State<FavoritePage>
     return BlocBuilder<FavoriteSongsCubit, FavoriteSongsState>(
       builder: (context, state) {
         if (state is FavoriteSongsLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
         }
 
         if (state is FavoriteSongsError) {
